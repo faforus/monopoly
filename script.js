@@ -1,5 +1,7 @@
 "use strict";
 
+// NEW BRANCH
+
 //NOTE
 // display information on the owned fields and the actual penalty
 // allow player to upgrade his field once he steps on it again
