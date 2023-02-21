@@ -2,17 +2,22 @@
 
 // NEW BRANCH
 
+//BUG when 2 players were in prison skipturn triggered undefined on another field where penalty was supposed to be paid
 //NOTE
-// display information on the owned fields and the actual penalty
-// allow player to upgrade his field once he steps on it again
+
+//create button that triggers popup that covers whole map.
+//use similar logic and display player properties
+//loop through the properties and on click trigger another popup
+// in that popup input an amount and transfer the property and update. or close modal
+
 // offer player a way to sell his property, maybe when he is about to lose?
 // when player dies do not remove him from the board until the next turn
 // CSS make it look nicer
 //NOTE
 
 // OPTIONS
-const sidesOfDie = 4; // Do not increase to more than 4 -- // lap logic implemented only for up to 2x4 side die
-const timesPenalty = 1;
+const sidesOfDie = 3; // Do not increase to more than 4 -- // lap logic implemented only for up to 2x4 side die
+const timesPenalty = 0.5;
 // OPTIONS
 
 const playerInfo = document.getElementById("player-info");
@@ -25,6 +30,7 @@ const popupMsg = document.querySelector(".popupmsg");
 const yes = document.querySelector(".yes");
 const no = document.querySelector(".no");
 const map = document.getElementById("map");
+const buyPopup = document.getElementById("buyPopup");
 
 let currentPlayer = 0; // define whose turn it is
 let tempPosition; // players position before roll
@@ -52,6 +58,86 @@ let generatedNumbers = [];
 let communityAr = [1, 2, 3];
 
 // Define every single field in the game, certain fields contain methods which are run once the player enters the field. Fields hold information about the streets, buyout price and penalty amount
+// let fields = [
+//   {
+//     number: 0,
+//     name: "Start Field",
+//     occupied: [],
+//     owned: false,
+//     action: startMoney,
+//     isPlayerDead: isPlayerDead,
+//   },
+//   {
+//     number: 1,
+//     name: "Slum Street",
+//     occupied: [],
+//     owned: false,
+//     ownedby: null,
+//     buyoutPrice: 100,
+//     penalty: 500 * timesPenalty,
+//     action: streetAction,
+//     isPlayerDead: isPlayerDead,
+//   },
+//   {
+//     number: 2,
+//     name: "Community Chest",
+//     occupied: [],
+//     owned: false,
+//     ownedby: null,
+//     action: community,
+//     isPlayerDead: isPlayerDead,
+//   },
+//   {
+//     number: 3,
+//     name: "Poor Street",
+//     occupied: [],
+//     owned: false,
+//     ownedby: null,
+//     buyoutPrice: 400,
+//     penalty: 700 * timesPenalty,
+//     action: streetAction,
+//     isPlayerDead: isPlayerDead,
+//   },
+//   {
+//     number: 4,
+//     name: "Parking Lot",
+//     occupied: [],
+//     owned: false,
+//     action: function () {},
+//     isPlayerDead: isPlayerDead,
+//   },
+//   {
+//     number: 5,
+//     name: "Regular Street",
+//     occupied: [],
+//     owned: false,
+//     ownedby: null,
+//     buyoutPrice: 500,
+//     penalty: 800 * timesPenalty,
+//     action: streetAction,
+//     isPlayerDead: isPlayerDead,
+//   },
+//   {
+//     number: 6,
+//     name: "Prison",
+//     occupied: [],
+//     owned: false,
+//     action: function () {},
+//     isPlayerDead: isPlayerDead,
+//   },
+//   {
+//     number: 7,
+//     name: "Fancy Street",
+//     occupied: [],
+//     owned: false,
+//     ownedby: null,
+//     buyoutPrice: 400,
+//     penalty: 1000 * timesPenalty,
+//     action: streetAction,
+//     isPlayerDead: isPlayerDead,
+//   },
+// ];
+
 let fields = [
   {
     number: 0,
@@ -63,17 +149,37 @@ let fields = [
   },
   {
     number: 1,
-    name: "Slum Street",
+    name: "Slum Street 1",
+    rank: 0,
+    set: 1,
+    twin: 2,
+    twinName: "Slum Street 2",
     occupied: [],
     owned: false,
     ownedby: null,
-    buyoutPrice: 100,
+    buyoutPrice: 150,
     penalty: 500 * timesPenalty,
     action: streetAction,
     isPlayerDead: isPlayerDead,
   },
   {
     number: 2,
+    name: "Slum Street 2",
+    rank: 0,
+    set: 1,
+    twin: 1,
+    twinName: "Slum Street 1",
+    occupied: [],
+    owned: false,
+    ownedby: null,
+    buyoutPrice: 200,
+    penalty: 600 * timesPenalty,
+    action: streetAction,
+    isPlayerDead: isPlayerDead,
+  },
+  {
+    number: 3,
+    oldNumber: 2,
     name: "Community Chest",
     occupied: [],
     owned: false,
@@ -82,18 +188,39 @@ let fields = [
     isPlayerDead: isPlayerDead,
   },
   {
-    number: 3,
-    name: "Poor Street",
+    number: 4,
+    oldNumber: 3,
+    name: "Poor Street 1",
+    rank: 0,
+    set: 2,
+    twin: 5,
+    twinName: "Poor Street 2",
     occupied: [],
     owned: false,
     ownedby: null,
-    buyoutPrice: 400,
+    buyoutPrice: 300,
     penalty: 700 * timesPenalty,
     action: streetAction,
     isPlayerDead: isPlayerDead,
   },
   {
-    number: 4,
+    number: 5,
+    name: "Poor Street 2",
+    rank: 0,
+    set: 2,
+    twin: 4,
+    twinName: "Poor Street 1",
+    occupied: [],
+    owned: false,
+    ownedby: null,
+    buyoutPrice: 400,
+    penalty: 800 * timesPenalty,
+    action: streetAction,
+    isPlayerDead: isPlayerDead,
+  },
+  {
+    number: 6,
+    oldNumber: 4,
     name: "Parking Lot",
     occupied: [],
     owned: false,
@@ -101,18 +228,39 @@ let fields = [
     isPlayerDead: isPlayerDead,
   },
   {
-    number: 5,
-    name: "Regular Street",
+    number: 7,
+    oldNumber: 5,
+    name: "Regular Street 1",
+    rank: 0,
+    set: 3,
+    twin: 8,
+    twinName: "Regular Street 2",
     occupied: [],
     owned: false,
     ownedby: null,
     buyoutPrice: 500,
-    penalty: 800 * timesPenalty,
+    penalty: 900 * timesPenalty,
     action: streetAction,
     isPlayerDead: isPlayerDead,
   },
   {
-    number: 6,
+    number: 8,
+    name: "Regular Street 2",
+    rank: 0,
+    set: 3,
+    twin: 7,
+    twinName: "Regular Street 1",
+    occupied: [],
+    owned: false,
+    ownedby: null,
+    buyoutPrice: 600,
+    penalty: 1000 * timesPenalty,
+    action: streetAction,
+    isPlayerDead: isPlayerDead,
+  },
+  {
+    number: 9,
+    oldNumber: 6,
     name: "Prison",
     occupied: [],
     owned: false,
@@ -120,51 +268,238 @@ let fields = [
     isPlayerDead: isPlayerDead,
   },
   {
-    number: 7,
-    name: "Fancy Street",
+    number: 10,
+    oldNumber: 7,
+    name: "Fancy Street 1",
+    rank: 0,
+    set: 4,
+    twin: 11,
+    twinName: "Fancy Street 2",
     occupied: [],
     owned: false,
     ownedby: null,
-    buyoutPrice: 400,
-    penalty: 1000 * timesPenalty,
+    buyoutPrice: 700,
+    penalty: 1200 * timesPenalty,
+    action: streetAction,
+    isPlayerDead: isPlayerDead,
+  },
+  {
+    number: 11,
+    name: "Fancy Street 2",
+    rank: 0,
+    set: 4,
+    twin: 10,
+    twinName: "Fancy Street 1",
+    occupied: [],
+    owned: false,
+    ownedby: null,
+    buyoutPrice: 800,
+    penalty: 1400 * timesPenalty,
     action: streetAction,
     isPlayerDead: isPlayerDead,
   },
 ];
+
 // Generate the map on page load
 updateMap();
 // Create and update the map based on the fields array and the occupied property
 function updateMap() {
-  map.innerHTML = `<div class="row">
-  <div class="field-1 fielddiv"><p class="field-name">Start</p><ul class="field-player">${fields[0].occupied
+  map.innerHTML = `
+  <div class="row">
+
+  <div class="field-0 fielddiv">
+  <p class="field-name">Start</p>
+  <div class="pawnzone">
+  <ul class="field-player">${fields[0].occupied
     .map((player) => `<li>${player}</li>`)
-    .join("")}</ul></div>
-  <div class="field-2 fielddiv"><p class="field-name">Slum Street</p><ul class="field-player">${fields[1].occupied
+    .join("")}</ul>
+  </div>
+  </div>
+  
+  <div class="field-1 fielddiv">
+  <p class="field-name">Slum Street 1</p>
+  <div class="pawnzone">
+    <ul class="field-player">${fields[1].occupied
+      .map((player) => `<li>${player}</li>`)
+      .join("")}</ul>
+      </div>
+    <div class="slumst"><p class="fieldinfoprice">Buyout: $${
+      fields[1].buyoutPrice
+    }, Penalty: $${fields[1].penalty}</p></div>
+${
+  fields[1].owned
+    ? `<div class="ownedby"><p class="little">Owned by: ${fields[1].ownedby}</p></div>`
+    : ""
+}
+  </div>
+  
+  <div class="field-2 fielddiv"><p class="field-name">Slum Street 2</p>
+  <div class="pawnzone">
+  <ul class="field-player">${fields[2].occupied
     .map((player) => `<li>${player}</li>`)
-    .join("")}</ul></div>
-  <div class="field-3 fielddiv"><p class="field-name">Community Chest</p><ul class="field-player">${fields[2].occupied
-    .map((player) => `<li>${player}</li>`)
-    .join("")}</ul></div>
+    .join("")}</ul>
+    </div>
+  <div class="slumst"><p class="fieldinfoprice">Buyout: $${
+    fields[2].buyoutPrice
+  }, Penalty: $${fields[2].penalty}</p></div>
+${
+  fields[2].owned
+    ? `<div class="ownedby"><p class="little">Owned by: ${fields[2].ownedby}</p></div>`
+    : ""
+}
 </div>
-<div class="row">
-  <div class="field-8 fielddiv"><p class="field-name">Fancy Street</p><ul class="field-player">${fields[7].occupied
+
+<div class="field-3 fielddiv"><p class="field-name">Community Chest</p>
+<div class="pawnzone">
+  <ul class="field-player">${fields[3].occupied
     .map((player) => `<li>${player}</li>`)
-    .join("")}</ul></div>
-  <div class="field-9 fielddiv"><p class="field-name">MONOPOLY</p></div>
-  <div class="field-4 fielddiv"><p class="field-name">Poor Street<p><ul class="field-player">${fields[3].occupied
-    .map((player) => `<li>${player}</li>`)
-    .join("")}</ul></p></div>
+    .join("")}</ul>
+    </div>
 </div>
+</div>
+
 <div class="row">
-  <div class="field-7 fielddiv"><p class="field-name">Prison</p><ul class="field-player">${fields[6].occupied
+
+  <div class="field-11 fielddiv">
+  <p class="field-name">Fancy Street 2</p>
+  <div class="pawnzone">
+    <ul class="field-player">${fields[11].occupied
+      .map((player) => `<li>${player}</li>`)
+      .join("")}</ul>
+      </div>
+    <div class="fancyst"><p class="fieldinfoprice">Buyout: $${
+      fields[11].buyoutPrice
+    }, Penalty: $${fields[11].penalty}</p></div>
+  ${
+    fields[11].owned
+      ? `<div class="ownedby"><p class="little">Owned by: ${fields[11].ownedby}</p></div>`
+      : ""
+  }
+  </div>
+  
+
+  <div class=" fielddiv">
+  <p class="field-name">MONOPOLY</p></div>
+
+  <div class=" fielddiv">
+  <p class="field-name">MONOPOLY</p></div>
+
+  <div class="field-4 fielddiv">
+  <p class="field-name">Poor Street 1<p>
+  <div class="pawnzone">
+    <ul class="field-player">${fields[4].occupied
+      .map((player) => `<li>${player}</li>`)
+      .join("")}</ul></p>    
+      </div>    
+    <div class="poorst"><p class="fieldinfoprice">Buyout: $${
+      fields[4].buyoutPrice
+    }, Penalty: $${fields[4].penalty}</p></div>
+  ${
+    fields[4].owned
+      ? `<div class="ownedby"><p class="little">Owned by: ${fields[4].ownedby}</p></div>`
+      : ""
+  }
+  </div>
+</div>
+
+<div class="row">
+
+  <div class="field-10 fielddiv">
+  <p class="field-name">Fancy Street</p>
+  <div class="pawnzone">
+    <ul class="field-player">${fields[10].occupied
+      .map((player) => `<li>${player}</li>`)
+      .join("")}</ul>
+      </div>
+    <div class="fancyst"><p class="fieldinfoprice">Buyout: $${
+      fields[10].buyoutPrice
+    }, Penalty: $${fields[10].penalty}</p></div>
+  ${
+    fields[10].owned
+      ? `<div class="ownedby"><p class="little">Owned by: ${fields[10].ownedby}</p></div>`
+      : ""
+  }
+  </div>
+  
+
+  <div class="fielddiv">
+  <p class="field-name">MONOPOLY</p></div>
+
+  <div class="fielddiv">
+  <p class="field-name">MONOPOLY</p></div>
+
+  <div class="field-5 fielddiv">
+  <p class="field-name">Poor Street 2<p>
+  <div class="pawnzone">
+    <ul class="field-player">${fields[5].occupied
+      .map((player) => `<li>${player}</li>`)
+      .join("")}</ul></p>    
+      </div>    
+    <div class="poorst"><p class="fieldinfoprice">Buyout: $${
+      fields[5].buyoutPrice
+    }, Penalty: $${fields[5].penalty}</p></div>
+  ${
+    fields[5].owned
+      ? `<div class="ownedby"><p class="little">Owned by: ${fields[5].ownedby}</p></div>`
+      : ""
+  }
+  </div>
+</div>
+
+<div class="row">
+
+<div class="field-9 fielddiv">
+<p class="field-name">Prison</p>
+<div class="pawnzone">
+  <ul class="field-player">${fields[9].occupied
     .map((player) => `<li>${player}</li>`)
-    .join("")}</ul></div>
-  <div class="field-6 fielddiv"><p class="field-name">Regular Street</p><ul class="field-player">${fields[5].occupied
-    .map((player) => `<li>${player}</li>`)
-    .join("")}</ul></div>
-  <div class="field-5 fielddiv"><p class="field-name">Parking Lot</p><ul class="field-player">${fields[4].occupied
-    .map((player) => `<li>${player}</li>`)
-    .join("")}</ul></div>
+    .join("")}</ul>
+    </div>
+</div>
+
+<div class="field-8 fielddiv">
+  <p class="field-name">Regular Street 2</p>
+  <div class="pawnzone">
+    <ul class="field-player">${fields[8].occupied
+      .map((player) => `<li>${player}</li>`)
+      .join("")}</ul>
+      </div>
+    <div class="regularst"><p class="fieldinfoprice">Buyout: $${
+      fields[8].buyoutPrice
+    }, Penalty: $${fields[8].penalty}</p></div>
+  ${
+    fields[8].owned
+      ? `<div class="ownedby"><p class="little">Owned by: ${fields[8].ownedby}</p></div>`
+      : ""
+  }
+  </div>
+
+
+  <div class="field-7 fielddiv">
+  <p class="field-name">Regular Street</p>
+  <div class="pawnzone">
+    <ul class="field-player">${fields[7].occupied
+      .map((player) => `<li>${player}</li>`)
+      .join("")}</ul>
+      </div>
+    <div class="regularst"><p class="fieldinfoprice">Buyout: $${
+      fields[7].buyoutPrice
+    }, Penalty: $${fields[7].penalty}</p></div>
+  ${
+    fields[7].owned
+      ? `<div class="ownedby"><p class="little">Owned by: ${fields[7].ownedby}</p></div>`
+      : ""
+  }
+  </div>
+
+  <div class="field-6 fielddiv">
+  <p class="field-name">Parking Lot</p>
+  <div class="pawnzone">
+    <ul class="field-player">${fields[6].occupied
+      .map((player) => `<li>${player}</li>`)
+      .join("")}</ul>
+      </div>
+  </div>
 </div>`;
 }
 // Collect player names and run startGame function with those names as arguments
@@ -253,8 +588,8 @@ function movePlayer() {
     // go to prison
     players[currentPlayer].prison = 2;
     fields[tempMovementPosition].occupied.pop();
-    fields[6].occupied.push(players[currentPlayer].name); // insert that player
-    players[currentPlayer].position = 6; // update player position
+    fields[9].occupied.push(players[currentPlayer].name); // insert that player
+    players[currentPlayer].position = 9; // update player position
     prisonRollMsg = `<p class="red">${players[currentPlayer].name}, You rolled the same numbers again. You're going to prison for 2 turns!<p>`;
     prisonRoll = 0;
     //update current player
@@ -289,8 +624,8 @@ function movePlayer() {
     players[currentPlayer].name
   } rolled ${currentRoll} and moved from ${fields[tempPosition].name} to ${
     fields[
-      tempPosition + currentRoll >= 8
-        ? tempPosition + currentRoll - 8
+      tempPosition + currentRoll >= 12
+        ? tempPosition + currentRoll - 12
         : tempPosition + currentRoll
     ].name
   }.</p>`;
@@ -298,20 +633,20 @@ function movePlayer() {
   //set buer
   buyer = currentPlayer;
   // if you reached the start
-  if (tempPosition + currentRoll >= 8) {
-    fields[tempPosition + currentRoll - 8].occupied.push(
+  if (tempPosition + currentRoll >= 12) {
+    fields[tempPosition + currentRoll - 12].occupied.push(
       players[currentPlayer].name
     );
-    tempMovementPosition = tempPosition + currentRoll - 8;
+    tempMovementPosition = tempPosition + currentRoll - 12;
     // insert that player
     players[currentPlayer].position =
-      players[currentPlayer].position + currentRoll - 8; // update player position
+      players[currentPlayer].position + currentRoll - 12; // update player position
     fields[0].action();
     fields[0].isPlayerDead();
-    if (tempPosition + currentRoll - 8 !== 0) {
-      tempMovementPosition = tempPosition + currentRoll - 8;
-      fields[tempPosition + currentRoll - 8].action();
-      fields[tempPosition + currentRoll - 8].isPlayerDead();
+    if (tempPosition + currentRoll - 12 !== 0) {
+      tempMovementPosition = tempPosition + currentRoll - 12;
+      fields[tempPosition + currentRoll - 12].action();
+      fields[tempPosition + currentRoll - 12].isPlayerDead();
     }
   } else {
     tempMovementPosition = tempPosition + currentRoll;
@@ -402,6 +737,7 @@ function rollTwoDice() {
   displayDie(roll1, "die1");
   displayDie(roll2, "die2");
   return rollSum;
+  // return 1;
 }
 // Display dice based on a case
 function displayDie(num, dieDiv) {
@@ -480,6 +816,7 @@ function skipTurn() {
   }
 }
 // Update the player scoreboard
+
 function updatePlayerInfo() {
   let moreHtml = "";
   for (let i = 0; i < players.length; i++) {
@@ -488,7 +825,7 @@ function updatePlayerInfo() {
     if (players[i].properties.length > 0) {
       html += `<p>Current properties:</p><ul>`;
       for (let j = 0; j < players[i].properties.length; j++) {
-        html += `<li>${players[i].properties[j]}</li>`;
+        html += `<li><button class="buyButton button${j}" data-player="${i}">${players[i].properties[j]}</button></li>`;
       }
       html += `</ul>`;
     }
@@ -503,6 +840,16 @@ function updatePlayerInfo() {
     moreHtml += html;
   }
   playerInfo.innerHTML = moreHtml;
+
+  let buttons = document.querySelectorAll(".buyButton");
+  buttons.forEach((button) => {
+    button.addEventListener("click", function (event) {
+      let playerIndex = event.target.dataset.player;
+      let player = players[playerIndex];
+      // Do something with player object
+      console.log(player);
+    });
+  });
 }
 // toggle the buy property or game finisehd popup
 const toggleModal = function () {
@@ -581,9 +928,9 @@ function community() {
   } else if (randomNumber === 3) {
     // set prison turns to 2
     players[currentPlayer].prison = 2;
-    fields[2].occupied.pop();
-    fields[6].occupied.push(players[currentPlayer].name); // insert that player
-    players[currentPlayer].position = 6; // update player position
+    fields[3].occupied.pop();
+    fields[9].occupied.push(players[currentPlayer].name); // insert that player
+    players[currentPlayer].position = 9; // update player position
     communityMsg = `<p class="red">${players[currentPlayer].name}, you went through a red light. You're going to prison for 2 turns!<p>`;
   }
 }
@@ -608,6 +955,7 @@ function streetAction() {
         `<p class="green">${players[buyer].name} bought ${this.name} for ${this.buyoutPrice}.</p>`
       );
       updatePlayerInfo();
+      updateMap();
     };
     yes.addEventListener("click", yes.eventListener);
     no.removeEventListener("click", toggleModal);
@@ -615,9 +963,11 @@ function streetAction() {
   } else if (this.ownedby === players[currentPlayer].name) {
     // If you own this street and visit it
     welcomeHomeMsg = "<p>Welcome home.</p>";
+    upgradeProperty();
   } else {
     propertyPenaltyMsg = `<p class="red">${players[currentPlayer].name}, you entered ${this.ownedby}'s property: ${this.name}, and had to pay ${this.penalty}.</p>`;
     // If the player cannot afford to pay the penalty in full only take his remaining money
+    //IMPORTANT BUG doesnt work
     if (players[currentPlayer].money < this.penalty) {
       players.find((player) => player.name === this.ownedby).money =
         players.find((player) => player.name === this.ownedby).money +
@@ -661,5 +1011,51 @@ function determineWinner() {
     updateLog(`<p class="green bold-upper">Player ${winner} won the game!</p>`);
   }
 }
+// If you own a set of streets upgrade them when stepped on a given field
+function upgradeProperty() {
+  //If player owns this field and adjecent and that field is part of a set...
+  if (
+    fields[tempMovementPosition].set === fields[tempMovementPosition - 1].set ||
+    fields[tempMovementPosition].set === fields[tempMovementPosition + 1].set
+  ) {
+    if (
+      fields[tempMovementPosition].ownedby ===
+        fields[tempMovementPosition - 1].ownedby ||
+      fields[tempMovementPosition].ownedby ===
+        fields[tempMovementPosition + 1].ownedby
+    ) {
+      if (
+        fields[tempMovementPosition].rank < 4 &&
+        players[buyer].money >= fields[tempMovementPosition].buyoutPrice
+      ) {
+        toggleModal();
+        generatePopupMsg(
+          `You can upgrade this property for $${fields[tempMovementPosition].buyoutPrice}.`
+        );
+        yes.removeEventListener("click", yes.eventListener);
+        yes.eventListener = () => {
+          toggleModal();
+          players[buyer].money =
+            players[buyer].money - fields[tempMovementPosition].buyoutPrice;
+          fields[tempMovementPosition].rank += 1;
+          fields[tempMovementPosition].penalty *= 1.25;
+          fields[tempMovementPosition].penalty = Math.floor(
+            fields[tempMovementPosition].penalty
+          );
+          updateLog(
+            `<p class="green">${players[buyer].name} upgraded ${fields[tempMovementPosition].name} for $${fields[tempMovementPosition].buyoutPrice} to rank ${fields[tempMovementPosition].rank}.</p>`
+          );
+          updatePlayerInfo();
+          updateMap();
+        };
+        yes.addEventListener("click", yes.eventListener);
+        no.removeEventListener("click", toggleModal);
+        no.addEventListener("click", toggleModal);
+      }
+    }
+  }
+}
+
 // Start the game with default players. Press start game button and close the window
-startGame("1Filip", "2Asia", "3Wojtek", "4Joanna");
+// startGame("1Filip", "2Asia", "3Wojtek", "4Joanna");
+startGame("1Filip", "2Asia");
