@@ -95,19 +95,19 @@ html {
   transform: translate(-50%, -50%);
 }
 
-#buyPopup {
-  /* display: flex;
+.buyPopup {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center; */
+  justify-content: center;
   position: absolute;
-  width: 200px;
+  width: 590px;
   height: 200px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: white;
-  z-index: 1;
+  background-color: rgb(141, 0, 0);
+  z-index: 6;
 }
 
 .row {
@@ -359,6 +359,11 @@ li {
   width: 150px;
   height: 50px;
   text-align: center;
+  border: none;
+}
+
+.buyButton:hover {
+  opacity: 0.5;
 }
 
 #dieBorder1 {
@@ -410,6 +415,10 @@ li {
 
 .green {
   color: green;
+}
+
+.greenbg {
+  background-color: lightgreen;
 }
 
 .bold-upper {

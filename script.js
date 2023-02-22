@@ -30,8 +30,11 @@ const popupMsg = document.querySelector(".popupmsg");
 const yes = document.querySelector(".yes");
 const no = document.querySelector(".no");
 const map = document.getElementById("map");
-const buyPopup = document.getElementById("buyPopup");
-
+const buyPopup = document.querySelector(".buyPopup");
+const buyPopupClass = document.querySelector(".buyPopupClass");
+const btnSell = document.getElementById("sell");
+const btnNoSell = document.getElementById("noSell");
+const turn = document.getElementById("turn");
 let currentPlayer = 0; // define whose turn it is
 let tempPosition; // players position before roll
 let tempMovementPosition = 0; // players position after roll
@@ -639,25 +642,20 @@ function movePlayer() {
     );
     tempMovementPosition = tempPosition + currentRoll - 12;
     // insert that player
-    players[currentPlayer].position =
-      players[currentPlayer].position + currentRoll - 12; // update player position
+    players[currentPlayer].position = tempMovementPosition; // update player position
     fields[0].action();
     fields[0].isPlayerDead();
     if (tempPosition + currentRoll - 12 !== 0) {
-      tempMovementPosition = tempPosition + currentRoll - 12;
-      fields[tempPosition + currentRoll - 12].action();
-      fields[tempPosition + currentRoll - 12].isPlayerDead();
+      fields[tempMovementPosition].action();
+      fields[tempMovementPosition].isPlayerDead();
     }
   } else {
     tempMovementPosition = tempPosition + currentRoll;
     //if you have not reached the start
-    fields[tempPosition + currentRoll].occupied.push(
-      players[currentPlayer].name
-    ); // insert that player
-    players[currentPlayer].position =
-      players[currentPlayer].position + currentRoll; // update player position
-    fields[tempPosition + currentRoll].action(); // run a field specific function
-    fields[tempPosition + currentRoll].isPlayerDead();
+    fields[tempMovementPosition].occupied.push(players[currentPlayer].name); // insert that player
+    players[currentPlayer].position = tempMovementPosition; // update player position
+    fields[tempMovementPosition].action(); // run a field specific function
+    fields[tempMovementPosition].isPlayerDead();
   }
   updateLog("<p>-----------------------------------------</p>");
   updateLog(releasedPropertiesMsg);
@@ -825,7 +823,17 @@ function updatePlayerInfo() {
     if (players[i].properties.length > 0) {
       html += `<p>Current properties:</p><ul>`;
       for (let j = 0; j < players[i].properties.length; j++) {
-        html += `<li><button class="buyButton button${j}" data-player="${i}">${players[i].properties[j]}</button></li>`;
+        html += `<li>
+
+        <button class="buyButton button${j} ${
+          players[currentPlayer].properties.includes(players[i].properties[j])
+            ? ""
+            : "greenbg"
+        }" data-player="${i}" data-property="${players[i].properties[j]}">${
+          players[i].properties[j]
+        }</button>
+        
+        </li>`;
       }
       html += `</ul>`;
     }
@@ -839,21 +847,27 @@ function updatePlayerInfo() {
     }`;
     moreHtml += html;
   }
-  playerInfo.innerHTML = moreHtml;
 
-  let buttons = document.querySelectorAll(".buyButton");
-  buttons.forEach((button) => {
-    button.addEventListener("click", function (event) {
-      let playerIndex = event.target.dataset.player;
-      let player = players[playerIndex];
-      // Do something with player object
-      console.log(player);
-    });
-  });
+  playerInfo.innerHTML = moreHtml;
+  sellButtons();
 }
+// if (playerInfo.innerHTML === moreHtml) {
+//   console.log("not updated");
+//   return;
+// } else {
+//   console.log("updated");
+//   playerInfo.innerHTML = moreHtml;
+//   sellButtons();
+// }
+
 // toggle the buy property or game finisehd popup
 const toggleModal = function () {
   modal.classList.toggle("hidden");
+  overlay.classList.toggle("hidden");
+};
+// toggle the sell property popup
+const toggleSellModal = function () {
+  buyPopup.classList.toggle("hidden");
   overlay.classList.toggle("hidden");
 };
 // Generate a popup message - buy property or game finisehd
@@ -924,7 +938,9 @@ function community() {
   } else if (randomNumber === 2) {
     players[currentPlayer].money =
       players[currentPlayer].money - 500 * timesPenalty;
-    communityMsg = `<p class="red">${players[currentPlayer].name}, you were mugged and lost $500.</p>`;
+    communityMsg = `<p class="red">${
+      players[currentPlayer].name
+    }, you were mugged and lost $${500 * timesPenalty}.</p>`;
   } else if (randomNumber === 3) {
     // set prison turns to 2
     players[currentPlayer].prison = 2;
@@ -1059,3 +1075,50 @@ function upgradeProperty() {
 // Start the game with default players. Press start game button and close the window
 // startGame("1Filip", "2Asia", "3Wojtek", "4Joanna");
 startGame("1Filip", "2Asia");
+
+function sellButtons() {
+  let buttons = document.querySelectorAll(".buyButton");
+
+  btnSell.removeEventListener("click", sell.EventListener);
+  btnNoSell.removeEventListener("click", btnNoSell.EventListener);
+
+  buttons.forEach((button) => {
+    if (button.dataset.player !== currentPlayer) {
+      button.addEventListener("click", function (event) {
+        toggleSellModal();
+        sell.EventListener = function () {
+          // player who owns the property
+          let playerIndex = event.target.dataset.player;
+          let player = players[playerIndex];
+          // field that is being owned
+          let fieldName = event.target.dataset.property;
+          let field = fields.find((field) => field.name === fieldName);
+          // make the change
+          field.ownedby = players[currentPlayer].name;
+          players[currentPlayer].properties.push(field.name);
+          let propIndex = player.properties.indexOf(fieldName);
+          player.properties.splice(propIndex, 1);
+          // update map/info
+          updateMap();
+          updatePlayerInfo();
+          toggleSellModal();
+        };
+        btnSell.addEventListener("click", sell.EventListener);
+
+        btnNoSell.EventListener = () => {
+          toggleSellModal();
+          updatePlayerInfo();
+          console.log("upda");
+        };
+
+        btnNoSell.addEventListener("click", btnNoSell.EventListener);
+      });
+    }
+  });
+}
+
+function whoseTurn() {
+  turn.innerHTML = `It is ${players[currentPlayer].name}'s turn.`;
+}
+
+setInterval(whoseTurn, 500);
