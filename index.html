@@ -11,8 +11,7 @@
 
 <body>
 
-  <button id="btn1">Start Game</button>
-  <button id="btn3">Sell Property</button>
+  <button id="btn1" class="smallBTN">Start Game</button>
 
   <div id="turn"></div>
   <div id="player-info"></div>
@@ -20,7 +19,6 @@
     <div id="dieBorder1">
       <div id="die1"></div>
     </div>
-
     <div id="dieBorder2">
       <div id="die2"></div>
     </div>
@@ -31,22 +29,30 @@
   </div>
 
   <div class="buyPopup hidden">
-
     <p class="buyPopupTxt"></p>
     <div>
       <input class="moneyInput" type="number">
-      <button id="sell">Sell</button>
-      <button id="noSell">No</button>
+      <button id="sell" class="smallBTN">Sell</button>
+      <button id="noSell" class="smallBTN">Return</button>
     </div>
     <select class="property-select"></select>
     <p class="buyPopupError"></p>
   </div>
 
+  <div class="suspendPopup hidden">
+    <p class="suspendPopupTxt"></p>
+    <div>
+      <button id="suspend" class="smallBTN">Suspend</button>
+      <button id="noSuspend" class="smallBTN">Return</button>
+    </div>
+  </div>
+
+
   <div class="popups hidden">
     <div class="popupmsg"> </div>
     <div class="buttons">
-      <button class="yes">Yes</button>
-      <button class="no">No</button>
+      <button class="yes smallBTN">Yes</button>
+      <button class="no smallBTN">No</button>
     </div>
   </div>
 
