@@ -12,9 +12,7 @@
 <body>
 
   <button id="btn1">Start Game</button>
-  <button id="btn2">Roll</button>
-  <button id="btn3">Buy Property</button>
-  <button id="btn4">Sell Property</button>
+  <button id="btn3">Sell Property</button>
 
   <div id="turn"></div>
   <div id="player-info"></div>
@@ -33,10 +31,15 @@
   </div>
 
   <div class="buyPopup hidden">
-    <p class="buyPopupClass"></p>
-    <input type="number">
-    <button id="sell">Sell</button>
-    <button id="noSell">No</button>
+
+    <p class="buyPopupTxt"></p>
+    <div>
+      <input class="moneyInput" type="number">
+      <button id="sell">Sell</button>
+      <button id="noSell">No</button>
+    </div>
+    <select class="property-select"></select>
+    <p class="buyPopupError"></p>
   </div>
 
   <div class="popups hidden">

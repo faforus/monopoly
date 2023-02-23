@@ -98,6 +98,7 @@ html {
 .buyPopup {
   display: flex;
   flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: absolute;
@@ -105,9 +106,13 @@ html {
   height: 200px;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgb(141, 0, 0);
+  transform: translate(-50%, 95px);
+  background-color: rgb(250, 204, 204);
   z-index: 6;
+}
+
+.buyPopupTxt {
+  color: black;
 }
 
 .row {
@@ -354,7 +359,7 @@ li {
   text-align: center;
 }
 
-.buyButton {
+.buyButtonActive {
   display: block;
   width: 150px;
   height: 50px;
@@ -362,12 +367,19 @@ li {
   border: none;
 }
 
-.buyButton:hover {
+.buyButtonInactive {
+  display: block;
+  width: 150px;
+  height: 50px;
+  text-align: center;
+  border: none;
+}
+
+.buyButtonActive:hover {
   opacity: 0.5;
 }
 
 #dieBorder1 {
-  display: none;
   position: absolute;
   width: 100px;
   height: 100px;
@@ -379,7 +391,6 @@ li {
 }
 
 #dieBorder2 {
-  display: none;
   position: absolute;
   width: 100px;
   height: 100px;
