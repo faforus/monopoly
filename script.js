@@ -48,6 +48,7 @@ let winner = null;
 let roll1 = 0;
 let roll2 = 0;
 let prisonRoll = 0; // if you rolled the same number twice the count goes up, at 2 you go to prison
+let wait = 0;
 // Empty messages
 let soldMsg = "";
 let buyMsg = "";
@@ -244,19 +245,19 @@ function updateMap() {
 
     <div class="row">
       ${updateFields(11, "Fancy Street 2", "fancyst")}
-      <div class=" fielddiv">
-      <p class="field-name">MONOPOLY</p></div>
-      <div class=" fielddiv">
-      <p class="field-name">MONOPOLY</p></div>
+      <div class="fielddiv emptyfield">
+      <p class="field-name" style="position:absolute; right:-10px;">MONO</p></div>
+      <div class="fielddiv emptyfield">
+      <p class="field-name" style="position:absolute; left:10px;">POLY</p></div>
       ${updateFields(4, "Poor Street 1", "poorst")}
     </div>
 
     <div class="row">
       ${updateFields(10, "Fancy Street 1", "fancyst")}
-      <div class="fielddiv">
-      <p class="field-name">MONOPOLY</p></div>
-      <div class="fielddiv">
-      <p class="field-name">MONOPOLY</p></div>
+      <div class="fielddiv emptyfield">
+      <p class="field-name"></p></div>
+      <div class="fielddiv emptyfield">
+      <p class="field-name"></p></div>
       ${updateFields(5, "Poor Street 2", "poorst")}
     </div>
 
@@ -289,9 +290,9 @@ ${
     : `${`<div class="${
         fields[fieldNum].suspended ? `redsus` : `${fieldStyle} allStreets`
       }">
-<p class="fieldinfoprice">Buyout: $${fields[fieldNum].buyoutPrice}, Penalty: $${
-        fields[fieldNum].penalty
-      }</p>
+<p class="fieldinfoprice">Buyout: <b>$${
+        fields[fieldNum].buyoutPrice
+      }</b>, Penalty: <b>$${fields[fieldNum].penalty}</b></p>
 </div>
 ${
   fields[fieldNum].owned
@@ -397,8 +398,10 @@ function movePlayer() {
     //update current player
     if (currentPlayer === players.length - 1) {
       currentPlayer = 0;
+      whoseTurn();
     } else {
       currentPlayer++;
+      whoseTurn();
     }
     // no turn for dead or jailed players
     while (
@@ -483,8 +486,10 @@ function movePlayer() {
       //update current player
       if (currentPlayer === players.length - 1) {
         currentPlayer = 0;
+        whoseTurn();
       } else {
         currentPlayer++;
+        whoseTurn();
       }
       // no turn for dead or jailed players
       while (
@@ -512,8 +517,14 @@ function movePlayer() {
   //update current player
   if (currentPlayer === players.length - 1) {
     currentPlayer = 0;
+    if (!wait) {
+      whoseTurn();
+    }
   } else {
     currentPlayer++;
+    if (!wait) {
+      whoseTurn();
+    }
   }
   // no turn for dead or jailed players
   while (
@@ -607,8 +618,10 @@ function skipTurn() {
     // skip turn
     if (currentPlayer === players.length - 1) {
       currentPlayer = 0;
+      whoseTurn();
     } else {
       currentPlayer++;
+      whoseTurn();
     }
   }
 }
@@ -731,10 +744,6 @@ function sellButtons() {
 
   // AVAILABLE FOR SELL BUTTONS
   buttonsAC.forEach((button) => {
-    // if (button.dataset.suspended === "suspended") {
-    // } else {
-    //   button.classList.toggle("greenbg");
-    // }
     let iFFieldIndex = fields.findIndex(
       (field) => field.name === button.dataset.property
     );
@@ -747,11 +756,6 @@ function sellButtons() {
       (fields[iFFieldIndex - 1]?.rank === 0 ||
         fields[iFFieldIndex + 1]?.rank === 0)
     ) {
-      // if (
-      // optional cannot buy if player owns all streets
-      // fields[iFFieldIndex].ownedby !== fields[iFFieldIndex - 1].ownedby ||
-      // fields[iFFieldIndex].ownedby !== fields[iFFieldIndex + 1].ownedby
-      // ) {
       button.addEventListener("click", function (event) {
         toggleSellModal(
           `${players[currentPlayer].name}, how much do you want to pay for this property?`
@@ -767,9 +771,7 @@ function sellButtons() {
           option.text = propertyName;
           selectElement.appendChild(option);
         });
-
-        selectElement.value;
-
+        // SELL EVENT ONO CLICK
         sell.EventListener = function () {
           // player who owns the property
           let playerIndex = event.target.dataset.player;
@@ -777,25 +779,36 @@ function sellButtons() {
           // field that is being owned
           let fieldName = event.target.dataset.property;
           let field = fields.find((field) => field.name === fieldName);
-          // make the change if can afford
+          // If player has enough money or selected his own street to trade
           if (
             (Number(moneyInput.value) < players[currentPlayer].money &&
               Number(moneyInput.value) >= field.buyoutPrice) ||
             selectElement.value
           ) {
             if (selectElement.value) {
-              let propIndex = players[currentPlayer].properties.indexOf(
+              // Target current players property in player prop array to trade
+              let sellerPropIndex = players[currentPlayer].properties.indexOf(
                 selectElement.value
               );
-              players[currentPlayer].properties.splice(propIndex, 1);
+              let tradePropIndex = fields.find(
+                (field) => field.name === selectElement.value
+              );
+              // Remove that property from players prop parray
+              players[currentPlayer].properties.splice(sellerPropIndex, 1);
+              // push that property to new players prop array
               player.properties.push(selectElement.value);
-              field.ownedby = players[currentPlayer].name;
+              // change the owner in property field
+              tradePropIndex.ownedby = player.name;
             }
+            // trade money
             players[currentPlayer].money -= Number(moneyInput.value);
             player.money += Number(moneyInput.value);
+            // update the owner of prop that was bought
             field.ownedby = players[currentPlayer].name;
+            // push the new property into current players prop array
             players[currentPlayer].properties.push(field.name);
             let propIndex = player.properties.indexOf(fieldName);
+            // remove that property from old owner
             player.properties.splice(propIndex, 1);
             soldMsg = `<p class="green">${
               players[currentPlayer].name
@@ -947,6 +960,7 @@ function streetAction() {
   if (!this.owned && players[buyer].money >= this.buyoutPrice) {
     // Buy this field if criteria are met
     toggleModal();
+    wait = 1;
     generatePopupMsg(
       `${players[currentPlayer].name}, you rolled ${currentRoll}, moved from ${fields[tempPosition].name} to ${this.name}. You have a chance to buy this property for $${this.buyoutPrice}.`
     );
@@ -964,10 +978,21 @@ function streetAction() {
       );
       updatePlayerInfo();
       updateMap();
+      whoseTurn();
+      wait = 0;
     };
     yes.addEventListener("click", yes.eventListener);
-    no.removeEventListener("click", toggleModal);
-    no.addEventListener("click", toggleModal);
+    function handleNoClick() {
+      toggleModal();
+      wait = 0;
+      whoseTurn();
+
+      // Remove the event listener
+      no.removeEventListener("click", handleNoClick);
+    }
+
+    no.removeEventListener("click", handleNoClick);
+    no.addEventListener("click", handleNoClick);
   } else if (this.ownedby === players[currentPlayer].name) {
     // If you own this street and visit it
     welcomeHomeMsg = "<p>Welcome home.</p>";
@@ -1010,6 +1035,7 @@ function upgradeProperty() {
         fields[tempMovementPosition].rank < 4 &&
         players[buyer].money >= fields[tempMovementPosition].buyoutPrice
       ) {
+        wait = 1;
         toggleModal();
         generatePopupMsg(
           `You can upgrade this ${fields[tempMovementPosition].name} for $${fields[tempMovementPosition].buyoutPrice}.`
@@ -1029,10 +1055,21 @@ function upgradeProperty() {
           );
           updatePlayerInfo();
           updateMap();
+          whoseTurn();
+          wait = 0;
         };
         yes.addEventListener("click", yes.eventListener);
-        no.removeEventListener("click", toggleModal);
-        no.addEventListener("click", toggleModal);
+        function handleNoClick2() {
+          toggleModal();
+          wait = 0;
+          whoseTurn();
+
+          // Remove the event listener
+          no.removeEventListener("click", handleNoClick2);
+        }
+
+        no.removeEventListener("click", handleNoClick2);
+        no.addEventListener("click", handleNoClick2);
       }
     }
   }
@@ -1067,11 +1104,19 @@ function determineWinner() {
 }
 
 // Start the game with default players. Press start game button and close the window
-startGame("Filip", "Asia", "Basia", "Kasia");
+startGame("Filip", "Asia");
 if (players.length > 0) btn1.style.display = "none";
 
 function whoseTurn() {
   turn.innerHTML = `<p style="font-size: 20px;">It is ${players[currentPlayer].name}'s turn.</p>`;
+  document.getElementById("turn").style.display = "flex";
+  document.getElementById("turn").style.opacity = 1;
+  setTimeout(function () {
+    document.getElementById("turn").style.opacity = 0;
+    setTimeout(function () {
+      document.getElementById("turn").style.display = "none";
+    }, 350);
+  }, 350);
 }
 
-setInterval(whoseTurn, 100);
+// setInterval(whoseTurn, 100);
