@@ -382,6 +382,9 @@ document.addEventListener("keydown", function (e) {
 //NOTE Move player - most complex function that triggers other functions or methods
 //
 function movePlayer() {
+  if (winner) {
+    return;
+  }
   // assign current position and roll outcome
   tempPosition = players[currentPlayer].position;
 
@@ -948,7 +951,7 @@ function community() {
   } else if (randomNumber === 5) {
     fields[3].occupied.pop();
     fields[0].occupied.push(players[currentPlayer].name); // insert that player
-    players[currentPlayer].position = 11; // update player position
+    players[currentPlayer].position = 0; // update player position
     tempMovementPosition = 0;
     fields[0].action(); // action
     fields[0].isPlayerDead(); // action
@@ -964,7 +967,6 @@ function streetAction() {
     generatePopupMsg(
       `${players[currentPlayer].name}, you rolled ${currentRoll}, moved from ${fields[tempPosition].name} to ${this.name}. You have a chance to buy this property for $${this.buyoutPrice}.`
     );
-    yes.removeEventListener("click", yes.eventListener);
     yes.eventListener = () => {
       toggleModal();
       this.owned = true;
@@ -980,18 +982,18 @@ function streetAction() {
       updateMap();
       whoseTurn();
       wait = 0;
+      yes.removeEventListener("click", yes.eventListener);
+      no.removeEventListener("click", handleNoClick);
     };
     yes.addEventListener("click", yes.eventListener);
     function handleNoClick() {
       toggleModal();
       wait = 0;
       whoseTurn();
-
       // Remove the event listener
       no.removeEventListener("click", handleNoClick);
+      yes.removeEventListener("click", yes.eventListener);
     }
-
-    no.removeEventListener("click", handleNoClick);
     no.addEventListener("click", handleNoClick);
   } else if (this.ownedby === players[currentPlayer].name) {
     // If you own this street and visit it
@@ -1040,7 +1042,6 @@ function upgradeProperty() {
         generatePopupMsg(
           `You can upgrade this ${fields[tempMovementPosition].name} for $${fields[tempMovementPosition].buyoutPrice}.`
         );
-        yes.removeEventListener("click", yes.eventListener);
         yes.eventListener = () => {
           toggleModal();
           players[buyer].money =
@@ -1057,18 +1058,18 @@ function upgradeProperty() {
           updateMap();
           whoseTurn();
           wait = 0;
+          no.removeEventListener("click", handleNoClick2);
+          yes.removeEventListener("click", yes.eventListener);
         };
         yes.addEventListener("click", yes.eventListener);
         function handleNoClick2() {
           toggleModal();
           wait = 0;
           whoseTurn();
-
           // Remove the event listener
+          yes.removeEventListener("click", yes.eventListener);
           no.removeEventListener("click", handleNoClick2);
         }
-
-        no.removeEventListener("click", handleNoClick2);
         no.addEventListener("click", handleNoClick2);
       }
     }
@@ -1092,29 +1093,30 @@ function determineWinner() {
   // Once the winner is determined the game ends
   if (winner) {
     toggleModal();
-    yes.removeEventListener("click", yes.eventListener);
-    yes.addEventListener("click", function () {
-      location.reload();
-    });
     generatePopupMsg(
       `Player ${winner} won! Do you want to start another game?`
     );
     updateLog(`<p class="green bold-upper">Player ${winner} won the game!</p>`);
+    yes.addEventListener("click", function () {
+      location.reload();
+    });
+    no.addEventListener("click", toggleModal);
   }
 }
 
 // Start the game with default players. Press start game button and close the window
-startGame("Filip", "Asia");
-if (players.length > 0) btn1.style.display = "none";
+startGame("Filip", "Asia", "dasd", "dasdas");
+// if (players.length > 0) btn1.style.display = "none";
 
 function whoseTurn() {
   turn.innerHTML = `<p style="font-size: 20px;">It is ${players[currentPlayer].name}'s turn.</p>`;
-  document.getElementById("turn").style.display = "flex";
-  document.getElementById("turn").style.opacity = 1;
+  let turnWindow = document.getElementById("turn");
+  turnWindow.style.display = "flex";
+  turnWindow.style.opacity = 1;
   setTimeout(function () {
-    document.getElementById("turn").style.opacity = 0;
+    turnWindow.style.opacity = 0;
     setTimeout(function () {
-      document.getElementById("turn").style.display = "none";
+      turnWindow.style.display = "none";
     }, 350);
   }, 350);
 }
