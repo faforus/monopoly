@@ -4,14 +4,6 @@
 // offer player a way to sell his property, maybe when he is about to lose?
 // when player dies do not remove him from the board until the next turn
 // CSS make it look nicer
-// USE THIS TO CREATE DIVS
-// const message = document.createElement('div');
-// message.classList.add('cookie-message');
-// message.innerHTML = `We use cookies for improved functionality and analytics. <button class="btn btn--close-cookie">Got it!</button>`;
-// header.append()
-// header.prepend()
-// header.before()
-// header.after()
 
 // implement protected fields
 // MAYBE USE SIMILAR METHODS TO MANAGE MONEY PROPS ETC? along with new array method to sum all values
@@ -45,7 +37,6 @@ const timesPenalty = 0.5;
 const cheat = false;
 const dieCheat = 3;
 // OPTIONS
-const playerInfo = document.getElementById("player-info");
 const log = document.getElementById("log");
 const btn1 = document.getElementById("btn1");
 const btn2 = document.getElementById("btn2");
@@ -59,7 +50,6 @@ const buyPopup = document.querySelector(".buyPopup");
 const buyPopupTxt = document.querySelector(".buyPopupTxt");
 const btnSell = document.getElementById("sell");
 const btnNoSell = document.getElementById("noSell");
-const turn = document.getElementById("turn");
 const buyButtonIctive = document.querySelector(".buyButtonIctive");
 const moneyInput = document.querySelector(".moneyInput");
 const buyPopupError = document.querySelector(".buyPopupError");
@@ -76,7 +66,6 @@ let tempPosition; // players position before roll
 let tempMovementPosition = 0; // players position after roll
 let tempPositionInArray = 0; // players position in players array
 let currentRoll = 0; //
-let buyer = 0; // current player frozen in time when property buyout popup message appears, currentPlayer already changed its value to next player
 let players = []; // will be filled with players object from collect names function
 let winner = null;
 let roll1 = 0;
@@ -415,7 +404,7 @@ document.addEventListener("keydown", function (e) {
 //
 //NOTE Move player - most complex function that triggers other functions or methods
 //
-function movePlayer() {
+async function movePlayer() {
   if (winner) {
     return;
   }
@@ -472,8 +461,6 @@ function movePlayer() {
     ].name
   }.</p>`;
 
-  //set buer
-  buyer = currentPlayer;
   // if you reached the start
   if (tempPosition + currentRoll >= 12) {
     fields[tempPosition + currentRoll - 12].occupied.push(
@@ -482,10 +469,10 @@ function movePlayer() {
     tempMovementPosition = tempPosition + currentRoll - 12;
     // insert that player
     players[currentPlayer].position = tempMovementPosition; // update player position
-    fields[0].action();
+    await fields[0].action();
     fields[0].isPlayerDead();
     if (tempPosition + currentRoll - 12 !== 0) {
-      fields[tempMovementPosition].action();
+      await fields[tempMovementPosition].action();
       fields[tempMovementPosition].isPlayerDead();
     }
   } else {
@@ -493,7 +480,7 @@ function movePlayer() {
     //if you have not reached the start
     fields[tempMovementPosition].occupied.push(players[currentPlayer].name); // insert that player
     players[currentPlayer].position = tempMovementPosition; // update player position
-    fields[tempMovementPosition].action(); // run a field specific function
+    await fields[tempMovementPosition].action(); // run a field specific function
     fields[tempMovementPosition].isPlayerDead();
   }
   updateLog("<p>-----------------------------------------</p>");
@@ -523,10 +510,8 @@ function movePlayer() {
       //update current player
       if (currentPlayer === players.length - 1) {
         currentPlayer = 0;
-        whoseTurn();
       } else {
         currentPlayer++;
-        whoseTurn();
       }
       // no turn for dead or jailed players
       while (
@@ -664,6 +649,22 @@ function skipTurn() {
 }
 // Update the player scoreboard and create buttons to trade streets
 function updatePlayerInfo() {
+  // const message = document.createElement('div');
+  // message.classList.add('cookie-message');
+  // message.innerHTML = `We use cookies for improved functionality and analytics. <button class="btn btn--close-cookie">Got it!</button>`;
+  // header.append()
+  // header.prepend()
+  // header.before()
+  // header.after()
+
+  if (document.getElementById("player-info") === null) {
+    const scoreboard = document.createElement("div");
+    scoreboard.id = "player-info";
+    document.body.append(scoreboard);
+  }
+
+  const scoreboard = document.getElementById("player-info");
+
   let moreHtml = "";
   for (let i = 0; i < players.length; i++) {
     let html = `<h3>Player ${i + 1}: ${players[i].name}</h3>
@@ -710,7 +711,7 @@ function updatePlayerInfo() {
     moreHtml += html;
   }
 
-  playerInfo.innerHTML = moreHtml;
+  scoreboard.innerHTML = moreHtml;
   sellButtons();
 }
 // create event listeners for the trade street buttons along with trade options
@@ -993,46 +994,52 @@ function community() {
   }
 }
 // Buy the street, visit the street that you own or pay the penalty if you do not
-function streetAction() {
-  if (!this.owned && players[buyer].money >= this.buyoutPrice) {
-    // Buy this field if criteria are met
-    toggleModal();
-    wait = 1;
-    generatePopupMsg(
-      `${players[currentPlayer].name}, you rolled ${currentRoll}, moved from ${fields[tempPosition].name} to ${this.name}. You have a chance to buy this property for $${this.buyoutPrice}.`
-    );
-    yes.eventListener = () => {
+async function streetAction() {
+  updateMap();
+  if (!this.owned && players[currentPlayer].money >= this.buyoutPrice) {
+    return new Promise((resolve) => {
+      // Buy this field if criteria are met
       toggleModal();
-      this.owned = true;
-      this.ownedby = players[buyer].name;
-      players[buyer].money = players[buyer].money - this.buyoutPrice;
-      // new code
-      players[buyer].properties.push(this.name);
-
-      updateLog(
-        `<p class="green">${players[buyer].name} bought ${this.name} for ${this.buyoutPrice}.</p>`
+      wait = 1;
+      generatePopupMsg(
+        `${players[currentPlayer].name}, you rolled ${currentRoll}, moved from ${fields[tempPosition].name} to ${this.name}. You have a chance to buy this property for $${this.buyoutPrice}.`
       );
-      updatePlayerInfo();
-      updateMap();
-      whoseTurn();
-      wait = 0;
-      yes.removeEventListener("click", yes.eventListener);
-      no.removeEventListener("click", handleNoClick);
-    };
-    yes.addEventListener("click", yes.eventListener);
-    function handleNoClick() {
-      toggleModal();
-      wait = 0;
-      whoseTurn();
-      // Remove the event listener
-      no.removeEventListener("click", handleNoClick);
-      yes.removeEventListener("click", yes.eventListener);
-    }
-    no.addEventListener("click", handleNoClick);
+      yes.eventListener = () => {
+        toggleModal();
+        this.owned = true;
+        this.ownedby = players[currentPlayer].name;
+        players[currentPlayer].money =
+          players[currentPlayer].money - this.buyoutPrice;
+        // new code
+        players[currentPlayer].properties.push(this.name);
+
+        updateLog(
+          `<p class="green">${players[currentPlayer].name} bought ${this.name} for ${this.buyoutPrice}.</p>`
+        );
+        updatePlayerInfo();
+        updateMap();
+        whoseTurn();
+        wait = 0;
+        yes.removeEventListener("click", yes.eventListener);
+        no.removeEventListener("click", handleNoClick);
+        resolve();
+      };
+      yes.addEventListener("click", yes.eventListener);
+      function handleNoClick() {
+        toggleModal();
+        wait = 0;
+        whoseTurn();
+        // Remove the event listener
+        no.removeEventListener("click", handleNoClick);
+        yes.removeEventListener("click", yes.eventListener);
+        resolve();
+      }
+      no.addEventListener("click", handleNoClick);
+    });
   } else if (this.ownedby === players[currentPlayer].name) {
     // If you own this street and visit it
     welcomeHomeMsg = "<p>Welcome home.</p>";
-    upgradeProperty();
+    await upgradeProperty();
   } else if (this.suspended) {
     welcomeHomeMsg = "<p>This street has been suspended, lucky you!.</p>";
   } else {
@@ -1069,42 +1076,47 @@ function upgradeProperty() {
     ) {
       if (
         fields[tempMovementPosition].rank < 4 &&
-        players[buyer].money >= fields[tempMovementPosition].buyoutPrice
+        players[currentPlayer].money >= fields[tempMovementPosition].buyoutPrice
       ) {
-        wait = 1;
-        toggleModal();
-        generatePopupMsg(
-          `You can upgrade this ${fields[tempMovementPosition].name} for $${fields[tempMovementPosition].buyoutPrice}.`
-        );
-        yes.eventListener = () => {
+        return new Promise((resolve) => {
+          wait = 1;
           toggleModal();
-          players[buyer].money =
-            players[buyer].money - fields[tempMovementPosition].buyoutPrice;
-          fields[tempMovementPosition].rank += 1;
-          fields[tempMovementPosition].penalty *= 1.5;
-          fields[tempMovementPosition].penalty = Math.floor(
-            fields[tempMovementPosition].penalty
+          generatePopupMsg(
+            `You can upgrade this ${fields[tempMovementPosition].name} for $${fields[tempMovementPosition].buyoutPrice}.`
           );
-          updateLog(
-            `<p class="green">${players[buyer].name} upgraded ${fields[tempMovementPosition].name} for $${fields[tempMovementPosition].buyoutPrice} to rank ${fields[tempMovementPosition].rank}.</p>`
-          );
-          updatePlayerInfo();
-          updateMap();
-          whoseTurn();
-          wait = 0;
-          no.removeEventListener("click", handleNoClick2);
-          yes.removeEventListener("click", yes.eventListener);
-        };
-        yes.addEventListener("click", yes.eventListener);
-        function handleNoClick2() {
-          toggleModal();
-          wait = 0;
-          whoseTurn();
-          // Remove the event listener
-          yes.removeEventListener("click", yes.eventListener);
-          no.removeEventListener("click", handleNoClick2);
-        }
-        no.addEventListener("click", handleNoClick2);
+          yes.eventListener = () => {
+            toggleModal();
+            players[currentPlayer].money =
+              players[currentPlayer].money -
+              fields[tempMovementPosition].buyoutPrice;
+            fields[tempMovementPosition].rank += 1;
+            fields[tempMovementPosition].penalty *= 1.5;
+            fields[tempMovementPosition].penalty = Math.floor(
+              fields[tempMovementPosition].penalty
+            );
+            updateLog(
+              `<p class="green">${players[currentPlayer].name} upgraded ${fields[tempMovementPosition].name} for $${fields[tempMovementPosition].buyoutPrice} to rank ${fields[tempMovementPosition].rank}.</p>`
+            );
+            updatePlayerInfo();
+            updateMap();
+            whoseTurn();
+            wait = 0;
+            no.removeEventListener("click", handleNoClick2);
+            yes.removeEventListener("click", yes.eventListener);
+            resolve();
+          };
+          yes.addEventListener("click", yes.eventListener);
+          function handleNoClick2() {
+            toggleModal();
+            wait = 0;
+            whoseTurn();
+            // Remove the event listener
+            yes.removeEventListener("click", yes.eventListener);
+            no.removeEventListener("click", handleNoClick2);
+            resolve();
+          }
+          no.addEventListener("click", handleNoClick2);
+        });
       }
     }
   }
@@ -1143,14 +1155,19 @@ startGame("Filip", "Asia", "Michał", "Magda");
 if (players.length > 0) btn1.style.display = "none";
 
 function whoseTurn() {
+  if (document.getElementById("turn") === null) {
+    const turn = document.createElement("div");
+    turn.id = "turn";
+    document.body.append(turn);
+  }
+  const turn = document.getElementById("turn");
   turn.innerHTML = `<p style="font-size: 20px;">It is ${players[currentPlayer].name}'s turn.</p>`;
-  let turnWindow = document.getElementById("turn");
-  turnWindow.style.display = "flex";
-  turnWindow.style.opacity = 1;
+  turn.style.display = "flex";
+  turn.style.opacity = 1;
   setTimeout(function () {
-    turnWindow.style.opacity = 0;
+    turn.style.opacity = 0;
     setTimeout(function () {
-      turnWindow.style.display = "none";
+      turn.style.display = "none";
     }, 350);
   }, 350);
 }
