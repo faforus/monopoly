@@ -4,6 +4,40 @@
 // offer player a way to sell his property, maybe when he is about to lose?
 // when player dies do not remove him from the board until the next turn
 // CSS make it look nicer
+// USE THIS TO CREATE DIVS
+// const message = document.createElement('div');
+// message.classList.add('cookie-message');
+// message.innerHTML = `We use cookies for improved functionality and analytics. <button class="btn btn--close-cookie">Got it!</button>`;
+// header.append()
+// header.prepend()
+// header.before()
+// header.after()
+
+// implement protected fields
+// MAYBE USE SIMILAR METHODS TO MANAGE MONEY PROPS ETC? along with new array method to sum all values
+/*
+class Account {
+  constructor(owner, currency, pin) {
+    this.owner = owner;
+    this.currency = currency;
+    this.pin = pin;
+    this.movements = [];
+    this.locale = navigator.language;
+  }
+  deposit(value) {
+    this.movements.push(value);
+  }
+  withdraw(value) {
+    this.deposit(-value);
+  }
+}
+
+const acc1 = new Account('Jonas', 'EUR', 1111);
+
+acc1.deposit(250);
+acc1.withdraw(140);
+console.log(acc1);
+*/
 
 // OPTIONS
 const sidesOfDie = 4; // Do not increase to more than 4 -- // lap logic implemented only for up to 2x4 side die
@@ -1105,8 +1139,8 @@ function determineWinner() {
 }
 
 // Start the game with default players. Press start game button and close the window
-startGame("Filip", "Asia", "dasd", "dasdas");
-// if (players.length > 0) btn1.style.display = "none";
+startGame("Filip", "Asia", "Michał", "Magda");
+if (players.length > 0) btn1.style.display = "none";
 
 function whoseTurn() {
   turn.innerHTML = `<p style="font-size: 20px;">It is ${players[currentPlayer].name}'s turn.</p>`;
@@ -1120,5 +1154,3 @@ function whoseTurn() {
     }, 350);
   }, 350);
 }
-
-// setInterval(whoseTurn, 100);
