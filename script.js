@@ -1,44 +1,12 @@
 "use strict";
 
-//NOTE
-//SUICIDE INCREASE RANK
-// IS PLAYER DEAD , WHAT IF PERSON OWNED IS THE COMMUNITY CHEST?
-// when player dies do not remove him from the board until the next turn
-// CSS make it look nicer
-// implement protected fields
-// MAYBE USE SIMILAR METHODS TO MANAGE MONEY PROPS ETC? along with new array method to sum all values
-
-// players can probably trade properties with houses on?
-
-/*
-class Account {
-  constructor(owner, currency, pin) {
-    this.owner = owner;
-    this.currency = currency;
-    this.pin = pin;
-    this.movements = [];
-    this.locale = navigator.language;
-  }
-  deposit(value) {
-    this.movements.push(value);
-  }
-  withdraw(value) {
-    this.deposit(-value);
-  }
-}
-
-const acc1 = new Account('Jonas', 'EUR', 1111);
-
-acc1.deposit(250);
-acc1.withdraw(140);
-console.log(acc1);
-*/
-
 // OPTIONS
 const sidesOfDie = 4; // Do not increase to more than 4 -- // lap logic implemented only for up to 2x4 side die
 const timesPenalty = 0.5;
 let cheat = false;
 let dieCheat = 1;
+// FIELD SIZE
+const fieldSize = 16;
 // OPTIONS
 const log = document.getElementById("log");
 const btn1 = document.getElementById("btn1");
@@ -68,6 +36,7 @@ const btnLeft = document.querySelector(".left");
 const btnRight = document.querySelector(".right");
 const housestxt = document.querySelector(".housestxt");
 const btnDeath = document.getElementById("death");
+const housesError = document.querySelector(".houseserror");
 // global variables
 const players = []; // will be filled with players object from collect names function
 let currentPlayer = 0; // define whose turn it is
@@ -84,6 +53,8 @@ let pendingPenalty = 0; // remaining of the penalty when player is selling stree
 let pendingPenaltyBenefactor; // Person who is owned the money
 let availableForTrade = []; // used for listing props for trade
 let filtered = []; // used for listing filtered props for trade
+let bank = false; // if player cannot afford the penalty which is not paid to a player but to a bank
+let chairman = false; // similar to above but if chairman chance card
 // Empty messages
 let soldMsg = "";
 let buyMsg = "";
@@ -114,11 +85,10 @@ const fields = [
   },
   {
     number: 1,
-    team: 2,
     name: "Old Kent Road",
     rank: 0,
     set: 1,
-    twin: 2,
+    total: 2,
     occupied: [],
     owned: false,
     ownedby: null,
@@ -130,11 +100,10 @@ const fields = [
   },
   {
     number: 2,
-    team: 1,
     name: "Whitechapel Road",
     rank: 0,
     set: 1,
-    twin: 1,
+    total: 2,
     occupied: [],
     owned: false,
     ownedby: null,
@@ -146,22 +115,28 @@ const fields = [
   },
   {
     number: 3,
-    oldNumber: 2,
     name: "Community Chest",
     occupied: [],
-    owned: false,
     ownedby: null,
+    owned: false,
     action: community,
     isPlayerDead: isPlayerDead,
   },
   {
     number: 4,
-    team: 5,
-    oldNumber: 3,
+    name: "Go To Jail",
+    occupied: [],
+    owned: false,
+    ownedby: null,
+    action: goToJail,
+    isPlayerDead: isPlayerDead,
+  },
+  {
+    number: 5,
     name: "The Angel",
     rank: 0,
     set: 2,
-    twin: 5,
+    total: 3,
     occupied: [],
     owned: false,
     ownedby: null,
@@ -172,12 +147,26 @@ const fields = [
     isPlayerDead: isPlayerDead,
   },
   {
-    number: 5,
-    team: 4,
+    number: 6,
+    name: "King's Cross",
+    rank: 0,
+    set: 2,
+    total: 3,
+    occupied: [],
+    owned: false,
+    ownedby: null,
+    buyoutPrice: 350,
+    originalPenalty: 750 * timesPenalty,
+    penalty: 750 * timesPenalty,
+    action: streetAction,
+    isPlayerDead: isPlayerDead,
+  },
+  {
+    number: 7,
     name: "Euston Road",
     rank: 0,
     set: 2,
-    twin: 4,
+    total: 3,
     occupied: [],
     owned: false,
     ownedby: null,
@@ -188,22 +177,19 @@ const fields = [
     isPlayerDead: isPlayerDead,
   },
   {
-    number: 6,
-    oldNumber: 4,
-    name: "Parking Lot",
+    number: 8,
+    name: "Free Parking",
     occupied: [],
     owned: false,
     action: function () {},
     isPlayerDead: isPlayerDead,
   },
   {
-    number: 7,
-    team: 8,
-    oldNumber: 5,
+    number: 9,
     name: "Bow Street",
     rank: 0,
     set: 3,
-    twin: 8,
+    total: 2,
     occupied: [],
     owned: false,
     ownedby: null,
@@ -214,12 +200,11 @@ const fields = [
     isPlayerDead: isPlayerDead,
   },
   {
-    number: 8,
-    team: 7,
+    number: 10,
     name: "Vine Street",
     rank: 0,
     set: 3,
-    twin: 7,
+    total: 2,
     occupied: [],
     owned: false,
     ownedby: null,
@@ -230,8 +215,16 @@ const fields = [
     isPlayerDead: isPlayerDead,
   },
   {
-    number: 9,
-    oldNumber: 6,
+    number: 11,
+    name: "Chance",
+    occupied: [],
+    owned: false,
+    ownedby: null,
+    action: community,
+    isPlayerDead: isPlayerDead,
+  },
+  {
+    number: 12,
     name: "Prison",
     displayName: "HM Pentonville",
     occupied: [],
@@ -240,13 +233,11 @@ const fields = [
     isPlayerDead: isPlayerDead,
   },
   {
-    number: 10,
-    team: 11,
-    oldNumber: 7,
+    number: 13,
     name: "Park Lane",
     rank: 0,
     set: 4,
-    twin: 11,
+    total: 2,
     twinName: "Fancy Street 2",
     occupied: [],
     owned: false,
@@ -258,12 +249,11 @@ const fields = [
     isPlayerDead: isPlayerDead,
   },
   {
-    number: 11,
-    team: 10,
+    number: 14,
     name: "Mayfair",
     rank: 0,
     set: 4,
-    twin: 10,
+    total: 2,
     twinName: "Fancy Street 1",
     occupied: [],
     owned: false,
@@ -272,6 +262,15 @@ const fields = [
     originalPenalty: 1400 * timesPenalty,
     penalty: 1400 * timesPenalty,
     action: streetAction,
+    isPlayerDead: isPlayerDead,
+  },
+  {
+    number: 15,
+    name: "Tax Office",
+    occupied: [],
+    owned: false,
+    ownedby: null,
+    action: tax,
     isPlayerDead: isPlayerDead,
   },
 ];
@@ -288,37 +287,54 @@ function updateMap() {
       ${updateFields(1, "Old Kent Road", "slumst")}
       ${updateFields(2, "Whitechapel Road", "slumst")}
       ${updateFields(3, "Community Chest", "notastreet")}
+      ${updateFields(4, "Go To Jail", "notastreet")}
     </div>
 
     <div class="row">
-      ${updateFields(11, "Mayfair", "fancyst")}
-      <div class="fielddiv emptyfield">
-      <p class="field-name" style="position:absolute; right:-10px;">MONO</p></div>
-      <div class="fielddiv emptyfield">
-      <p class="field-name" style="position:absolute; left:10px;">POLY</p></div>
-      ${updateFields(4, "The Angel", "poorst")}
-    </div>
-
-    <div class="row">
-      ${updateFields(10, "Park Lane", "fancyst")}
-      <div class="fielddiv emptyfield">
+      ${updateFields(15, "Tax Office", "notastreet")}
+      <div id="fielddivempty" class="emptyfield">
       <p class="field-name"></p></div>
-      <div class="fielddiv emptyfield">
+      <div id="fielddivempty" class="emptyfield">
+      <p class="field-name"></div>
+      <div id="fielddivempty" class="emptyfield">
       <p class="field-name"></p></div>
-      ${updateFields(5, "Euston Road", "poorst")}
+      ${updateFields(5, "The Angel", "poorst")}
     </div>
 
     <div class="row">
-      ${updateFields(9, "HM Pentonville", "notastreet")}
-      ${updateFields(8, "Vine Street", "regularst")}
-      ${updateFields(7, "Bow Street", "regularst")}
-      ${updateFields(6, "Parking", "notastreet")}
+      ${updateFields(14, "Mayfair", "fancyst")}
+      <div id="fielddivempty" class="emptyfield">
+      <p class="field-name"></div>
+      <div id="fielddivempty" class="emptyfield">
+      <p class="field-name"></div>
+      <div id="fielddivempty" class="emptyfield">
+      <p class="field-name"></div>
+      ${updateFields(6, "King's Cross", "poorst")}
+    </div>
+
+    <div class="row">
+    ${updateFields(13, "Park Lane", "fancyst")}
+    <div id="fielddivempty" class="emptyfield">
+    <p class="field-name"></p></div>
+    <div id="fielddivempty" class="emptyfield">
+    <p class="field-name"></p></div>
+    <div id="fielddivempty" class="emptyfield">
+    <p class="field-name"></p></div>
+    ${updateFields(7, "Euston Road", "poorst")}
+  </div>
+
+    <div class="row">
+      ${updateFields(12, "HM Pentonville", "notastreet")}
+      ${updateFields(11, "Chance", "notastreet")}
+      ${updateFields(10, "Vine Street", "regularst")}
+      ${updateFields(9, "Bow Street", "regularst")}
+      ${updateFields(8, "Free Parking", "notastreet")}
     </div>`;
 }
 // Update street and non street fields
 function updateFields(fieldNum, fieldName, fieldStyle) {
   return `
-  <div class="field-${fieldNum} fielddiv">
+  <div id="fielddiv" class="field-${fieldNum}">
     <p class="field-name">${fieldName}</p>
       <div class="pawnzone">
         <ul class="field-player">
@@ -339,7 +355,7 @@ ${
       }">
 <p class="fieldinfoprice">Buyout: <b>$${
         fields[fieldNum].buyoutPrice
-      }</b>, Penalty: <b>$${fields[fieldNum].penalty}</b></p>
+      }</b>, Penalty: <b>$${Math.floor(fields[fieldNum].penalty)}</b></p>
 </div>
 ${
   fields[fieldNum].owned
@@ -429,6 +445,8 @@ document.addEventListener("keydown", function (e) {
 //
 // Move player
 async function movePlayer() {
+  bank = false;
+  chairman = false;
   log.scrollTop = 0;
   if (winner) {
     return;
@@ -456,23 +474,23 @@ async function movePlayer() {
     fields[tempPosition].name
   }</b> to <b>${
     fields[
-      tempPosition + currentRoll >= 12
-        ? tempPosition + currentRoll - 12
+      tempPosition + currentRoll >= fieldSize
+        ? tempPosition + currentRoll - fieldSize
         : tempPosition + currentRoll
     ].name
   }</b>.`;
   // IMPORTANT ERRORS OCCUR HERE. REWRITE?
   // if you reached the start
-  if (tempPosition + currentRoll >= 12) {
-    fields[tempPosition + currentRoll - 12].occupied.push(
+  if (tempPosition + currentRoll >= fieldSize) {
+    fields[tempPosition + currentRoll - fieldSize].occupied.push(
       players[currentPlayer].name
     );
-    tempMovementPosition = tempPosition + currentRoll - 12;
+    tempMovementPosition = tempPosition + currentRoll - fieldSize;
     // insert that player
     players[currentPlayer].position = tempMovementPosition; // update player position
     await fields[0].action();
     await fields[0].isPlayerDead();
-    if (tempPosition + currentRoll - 12 !== 0) {
+    if (tempPosition + currentRoll - fieldSize !== 0) {
       await fields[tempMovementPosition].action();
       await fields[tempMovementPosition].isPlayerDead();
     }
@@ -543,7 +561,11 @@ function updateNextPlayer() {
 }
 // If you rolled doubles on your first roll
 function firstDoubles() {
-  if (roll1 === roll2 && prisonRoll === 0 && players[currentPlayer].money > 0) {
+  if (
+    roll1 === roll2 &&
+    prisonRoll === 0 &&
+    players[currentPlayer].money >= 0
+  ) {
     // if you just went to prison through community chest action
     if (players[currentPlayer].prison !== 0) {
       //update current player
@@ -566,12 +588,25 @@ function firstDoubles() {
 }
 // if you rolled doubles on second roll PRISON TIME
 function secondDoubles() {
-  if (roll1 === roll2 && prisonRoll === 1 && players[currentPlayer].money > 0) {
+  if (
+    roll1 === roll2 &&
+    prisonRoll === 1 &&
+    players[currentPlayer].money >= 0
+  ) {
+    // get out of jail card
+    if (players[currentPlayer].bribe) {
+      players[currentPlayer].bribe = false;
+      updateLog(
+        `<b>${players[currentPlayer].name}</b> used <b>GET OUT OF JAIL CARD</b>.`,
+        "orange"
+      );
+      return;
+    }
     // go to prison
-    players[currentPlayer].prison = 2;
+    players[currentPlayer].prison = 1;
     fields[tempMovementPosition].occupied.pop();
-    fields[9].occupied.push(players[currentPlayer].name); // insert that player
-    players[currentPlayer].position = 9; // update player position
+    fields[12].occupied.push(players[currentPlayer].name); // insert that player
+    players[currentPlayer].position = 12; // update player position
     prisonRollMsg = `<b>${players[currentPlayer].name}</b>, you rolled doubles again. You were caught speeding and you are going to jail for 2 turns!`;
     prisonRoll = 0;
     //update current player
@@ -660,7 +695,11 @@ function skipTurn() {
     if (players[currentPlayer].prison) {
       players[currentPlayer].prison = players[currentPlayer].prison - 1;
       updateLog(
-        `<b>${players[currentPlayer].name}</b>, you are still in jail. Turns to go free: <b>${players[currentPlayer].prison}</b>`,
+        `<b>${players[currentPlayer].name}</b>, you are still in jail. ${
+          players[currentPlayer].prison > 0
+            ? `Your turns are suspended.`
+            : `You will be free to go on your next turn.`
+        }</b>`,
         "tomato"
       );
     }
@@ -688,7 +727,7 @@ function updatePlayerInfo() {
     let html = `<h3 ${
       currentPlayer === players.indexOf(players[i]) ? 'class="highlight"' : ""
     }>Player ${i + 1}: ${players[i].name}</h3>
-    <p>Money: <b style="color: #333">$${players[i].money}</b></p>`;
+    <p>Money: <b style="color: #333">$${Math.floor(players[i].money)}</b></p>`;
     if (players[i].properties.length > 0) {
       html += `<p>Current properties:</p><ul>`;
       for (let j = 0; j < players[i].properties.length; j++) {
@@ -699,7 +738,7 @@ function updatePlayerInfo() {
             ? "buyButtonInactive"
             : "buyButtonActive"
         } ${players[i].properties[j]
-          .replace(/\s+/g, "-")
+          .replace(/[^a-zA-Z0-9]/g, "-")
           .toLowerCase()}" button${j} ${
           players[currentPlayer].properties.includes(players[i].properties[j])
             ? ""
@@ -744,18 +783,18 @@ function sellButtons() {
   let buttonsAC = document.querySelectorAll(".buyButtonActive");
   let buttonsIA = document.querySelectorAll(".buyButtonInactive");
   let buttonsSUS = document.querySelectorAll("[data-suspended='suspended']");
-
-  // SUSPENDED BUTTONS
-  buttonsSUS.forEach((button) => {
-    button.classList.toggle("redbg");
-  });
-
+  // IMPS FOR WHATEVER REASON THIS ABOVE AND BELOW NEED TO STAY HERE
   btnSell.removeEventListener("click", sell.EventListener);
   btnNoSell.removeEventListener("click", btnNoSell.EventListener);
   btnNoSuspend.removeEventListener("click", noSuspend.EventListener);
   btnSuspend.removeEventListener("click", suspend.EventListener);
+  // IMPS SUSPENDED BUTTONS COLOR CHANGE ONLY
+  buttonsSUS.forEach((button) => {
+    button.classList.toggle("redbg");
+  });
 
-  // CURRENT PLAYER'S BUTTONS
+  // IMPS
+  // IMPS CURRENT PLAYER'S BUTTONS (UPGRADE/SUSPEND)
   buttonsIA.forEach((button) => {
     if (button.dataset.suspended !== "suspended") {
       button.classList.toggle("buttonOpacity");
@@ -767,22 +806,13 @@ function sellButtons() {
       let msg = `${players[currentPlayer].name} you can mortgage ${field.name} for $${field.buyoutPrice}`;
       toggleSuspendModal(msg);
 
-      if (
-        fields[field.number].ownedby === fields[field.number - 1]?.ownedby ||
-        fields[field.number].ownedby === fields[field.number + 1]?.ownedby
-      ) {
+      if (determineAllFieldOwnership(fields[field.number])) {
         housesPopup.classList.toggle("hidden");
       }
 
-      // DOWNGRADE RANK
+      // IMPS DOWNGRADE RANK EVENTS
       let downEvent = function () {
-        if (
-          (field.rank > 0 &&
-            (field.rank === fields[field.number - 1]?.rank ||
-              field.rank === fields[field.number + 1]?.rank)) ||
-          field.rank - fields[field.number - 1]?.rank === 1 ||
-          field.rank - fields[field.number + 1]?.rank === 1
-        ) {
+        if (field.rank > 0 && determinePropertyUpgrade(field, 1)) {
           field.rank -= 1;
           field.penalty = (field.penalty / 3) * 2;
           players[currentPlayer].money += field.buyoutPrice;
@@ -791,18 +821,23 @@ function sellButtons() {
           updatePlayerInfo();
           btnSuspend.addEventListener("click", suspend.EventListener);
           btnNoSuspend.addEventListener("click", noSuspend.EventListener);
+          housesError.textContent = "";
+        } else {
+          housesError.textContent =
+            "You either cannot do that, or you need to downgrade the properties simultaneously.";
         }
       };
-      // UPGRADE RANK
+      // IMPS UPGRADE RANK EVENTS
       let upEvent = function () {
         if (
-          (players[currentPlayer].money >= field.buyoutPrice &&
-            field.rank < 4 &&
-            (field.rank === fields[field.number - 1]?.rank ||
-              field.rank === fields[field.number + 1]?.rank)) ||
-          field.rank - fields[field.number - 1]?.rank === -1 ||
-          field.rank - fields[field.number + 1]?.rank === -1
+          players[currentPlayer].money >= field.buyoutPrice &&
+          field.rank < 4 &&
+          determinePropertyUpgrade(field, -1)
         ) {
+          if (players[currentPlayer].money - field.buyoutPrice < 0) {
+            // BUG sometimes players can go below $0. extra protection
+            return;
+          }
           field.rank += 1;
           field.penalty *= 1.5;
           players[currentPlayer].money -= field.buyoutPrice;
@@ -811,20 +846,19 @@ function sellButtons() {
           updatePlayerInfo();
           btnSuspend.addEventListener("click", suspend.EventListener);
           btnNoSuspend.addEventListener("click", noSuspend.EventListener);
+          housesError.textContent = "";
+        } else {
+          housesError.textContent =
+            "You either cannot afford that, or you need to upgrade the properties simultaneously.";
         }
       };
-
-      if (
-        field.ownedby === fields[field.number - 1]?.ownedby ||
-        field.ownedby === fields[field.number + 1]?.ownedby
-      ) {
+      // IMPS UPGRADES ONLY AVAILABLE WHEN...
+      if (determineAllFieldOwnership(fields[field.number])) {
         housestxt.textContent = `Rank: ${field.rank}`;
         btnLeft.addEventListener("click", downEvent);
         btnRight.addEventListener("click", upEvent);
       }
-
-      /////////////////////////////////////////////////
-
+      // IMPS UNSUSPEND
       if (field.suspended && players[currentPlayer].money > field.buyoutPrice) {
         btnSuspend.textContent = "Unmortgage";
         suspendPopupTxt.innerHTML = `${players[currentPlayer].name} you can unmortgage ${field.name} for $${field.buyoutPrice}`;
@@ -842,6 +876,7 @@ function sellButtons() {
           if (!housesPopup.classList.contains("hidden")) {
             housesPopup.classList.toggle("hidden");
           }
+          housesError.textContent = "";
         };
       } else if (
         field.suspended &&
@@ -849,8 +884,14 @@ function sellButtons() {
       ) {
         toggleSuspendModal();
       } else {
+        // IMPS SUSPEND
         btnSuspend.textContent = "Mortage";
         suspend.EventListener = function () {
+          if (field.rank > 0) {
+            housesError.textContent =
+              "You cannot mortgage properties with rank other than 0.";
+            return;
+          }
           // make the change if can afford
           btnRight.removeEventListener("click", upEvent);
           btnLeft.removeEventListener("click", downEvent);
@@ -865,9 +906,10 @@ function sellButtons() {
           if (!housesPopup.classList.contains("hidden")) {
             housesPopup.classList.toggle("hidden");
           }
+          housesError.textContent = "";
         };
       }
-      // BUG when in one go you upgrade the street and then click mortgage it does not work. You need to leave the window first and come back
+      // IMPS ONLY SUSPEND FOR RANK 0
       if (field.rank === 0) {
         btnSuspend.addEventListener("click", suspend.EventListener);
       }
@@ -879,20 +921,21 @@ function sellButtons() {
         if (!housesPopup.classList.contains("hidden")) {
           housesPopup.classList.toggle("hidden");
         }
+        housesError.textContent = "";
       };
-
       btnNoSuspend.addEventListener("click", noSuspend.EventListener);
     });
   });
 
-  // AVAILABLE FOR SELL BUTTONS
+  // IMPS
+  // IMPS OTHER PLAYER BUTTONS (BUY)
   buttonsAC.forEach((button) => {
     let iFFieldIndex = fields.findIndex(
       (field) => field.name === button.dataset.property
     );
 
     if (
-      // create event listeners only for properties that do not belong to the current player. Do not create event listeners for properties that have higher rank(houses) and the adjecent properties.
+      // IMPS create event listeners only for properties that do not belong to the current player. Do not create event listeners for properties that have higher rank(houses) and the adjecent properties.
       button.dataset.player !== currentPlayer &&
       !fields[iFFieldIndex].suspended &&
       fields[iFFieldIndex].rank === 0 &&
@@ -903,7 +946,6 @@ function sellButtons() {
         toggleSellModal(
           `${players[currentPlayer].name}, how much do you want to pay for this property?`
         );
-
         // clear existing options
         selectElement.innerHTML = "<option disabled selected value></option>";
         // clear the arrays
@@ -940,7 +982,7 @@ function sellButtons() {
             selectElement.appendChild(option);
           }
         });
-        // SELL EVENT ON CLICK
+        // IMPS SELL BUTTON
         sell.EventListener = function () {
           // player who owns the property
           let playerIndex = event.target.dataset.player;
@@ -999,18 +1041,57 @@ function sellButtons() {
           }
         };
         btnSell.addEventListener("click", sell.EventListener);
-
+        // IMPS NO SELL BUTTON
         btnNoSell.EventListener = () => {
           toggleSellModal();
           updatePlayerInfo();
           moneyInput.value = "";
           buyPopupError.innerHTML = "";
         };
-
         btnNoSell.addEventListener("click", btnNoSell.EventListener);
       });
     }
   });
+}
+// Determine if player owns all field of a given type
+function determineAllFieldOwnership(fieldWithIndex) {
+  let filteredArray = [];
+  fields.filter((field) => {
+    if (field.set === fieldWithIndex.set) filteredArray.push(field);
+  });
+  let count = 0;
+  filteredArray.forEach((field) => {
+    if (
+      field.ownedby !== null &&
+      field.ownedby !== undefined &&
+      field.ownedby === fieldWithIndex.ownedby
+    ) {
+      count++;
+    }
+  });
+  return count === fieldWithIndex.total;
+}
+// Determine if player can upgrade or downgrade props
+function determinePropertyUpgrade(fieldWithIndex, plusMinus) {
+  // plusMinus +1 determinePropertyUpgrade
+  // plusMinus -1 determinePropertyDowngrade
+  let filteredArray = [];
+  fields.filter((field) => {
+    if (field.set === fieldWithIndex.set) filteredArray.push(field);
+  });
+  let indexToBeRemoved = filteredArray.indexOf(fieldWithIndex);
+  filteredArray.splice(indexToBeRemoved, 1);
+  let count = 0;
+  filteredArray.forEach((field) => {
+    if (
+      fieldWithIndex.rank - field.rank === 0 ||
+      fieldWithIndex.rank - field.rank === plusMinus
+    ) {
+      console.log();
+      count++;
+    }
+  });
+  return count === fieldWithIndex.total - 1;
 }
 // toggle the buy property or game finisehd popup
 const toggleModal = function () {
@@ -1050,28 +1131,96 @@ function isPlayerDead() {
   if (players[currentPlayer].money < 0) {
     if (players[currentPlayer].properties.length > 0) {
       return new Promise((resolve) => {
+        updatePlayerInfo();
         postponedMSG = 1;
         btnDeath.classList.toggle("hidden");
         updateLog(
-          `<b>${players[currentPlayer].name}</b>, you rolled <b>${currentRoll}</b> and entered <b>${this.name}</b>. You need to pay <b>${this.penalty}</b>, but cannot afford it. You are <b>${pendingPenalty}</b> short and are about to <b>lose</b>, sell whatever you have got to stay in the game!`,
+          `<b>${
+            players[currentPlayer].name
+          }</b>, you rolled <b>${currentRoll}</b> and entered <b>${
+            this.name
+          }</b>. You need to pay <b>${
+            this.penalty
+          }</b>, but cannot afford it. You are <b>${Math.floor(
+            pendingPenalty
+          )}</b> short and are about to <b>lose</b>, sell whatever you have got to stay in the game!`,
           "orangered"
         );
         const deathListener = () => {
           // if player will survive the penalty
-          if (players[currentPlayer].money >= pendingPenalty) {
-            pendingPenaltyBenefactor.money += pendingPenalty;
-            players[currentPlayer].money -= pendingPenalty;
-            players[currentPlayer].money += 1;
-            updateLog(
-              `<b>${players[currentPlayer].name}</b> managed to pay <b>${this.ownedby}</b> the remaining <b>$${pendingPenalty}</b>.`,
-              "tomato"
-            );
+          if (players[currentPlayer].money >= 0) {
+            let count = 0;
+            if (chairman) {
+              // determine how many players are owed money
+              players.forEach((e) => {
+                if (
+                  e === players[currentPlayer] ||
+                  (e !== players[currentPlayer] && e.money < 0)
+                ) {
+                } else {
+                  count++;
+                }
+              });
+              // distribute the money
+              players.forEach((e) => {
+                if (
+                  e === players[currentPlayer] ||
+                  (e !== players[currentPlayer] && e.money < 0)
+                ) {
+                  // do nothign
+                } else {
+                  // if can afford
+                  e.money += pendingPenalty / count;
+                }
+              });
+            } else if (!bank) {
+              pendingPenaltyBenefactor.money += pendingPenalty;
+              updateLog(
+                `<b>${players[currentPlayer].name}</b> managed to pay <b>${this.ownedby}</b> the remaining <b>$${pendingPenalty}</b>.`,
+                "tomato"
+              );
+            } else {
+              updateLog(
+                `<b>${players[currentPlayer].name}</b> managed to pay <b>The Bank</b> the remaining <b>$${pendingPenalty}</b>.`,
+                "tomato"
+              );
+            }
           } else {
             // if player will not be able to survive the penalty
-            pendingPenaltyBenefactor.money += players[currentPlayer]?.money;
-            pendingPenaltyBenefactor.money += 1;
-            players[currentPlayer].money -= pendingPenalty;
-            players[currentPlayer].money += 1;
+            if (chairman) {
+              // distribute the remaining money
+              let count = 0;
+              players.forEach((e) => {
+                if (
+                  e === players[currentPlayer] ||
+                  (e !== players[currentPlayer] && e.money < 0)
+                ) {
+                } else {
+                  count++;
+                }
+              });
+              players.forEach((e) => {
+                if (
+                  e === players[currentPlayer] ||
+                  (e !== players[currentPlayer] && e.money < 0)
+                ) {
+                  // do nothign
+                } else {
+                  // if cannot afford
+
+                  if (-pendingPenalty === players[currentPlayer].money) {
+                    return;
+                  } else {
+                    let newPenalty =
+                      (pendingPenalty + players[currentPlayer].money) / count;
+                    e.money += newPenalty;
+                  }
+                }
+              });
+            } else if (!bank) {
+              pendingPenaltyBenefactor.money +=
+                players[currentPlayer]?.money + pendingPenalty;
+            }
             deathMsg = `<b>${players[currentPlayer].name}</b> lost all the money and is out of the game!`;
             releasePlayerProperties(players[currentPlayer], fields);
           }
@@ -1123,16 +1272,18 @@ function startMoney() {
 }
 // Community Chest with 3 cards/possibilities
 async function community() {
+  let numOfCards = 8;
   communityMsg = "";
   // Reset the array once all cards were used up - shuffle cards
-  if (generatedNumbers.length === 5) {
+  if (generatedNumbers.length === numOfCards) {
     generatedNumbers = [];
   }
   // Generate random number
-  let randomNumber = Math.floor(Math.random() * 5) + 1;
+  let randomNumber = 8;
+  // Math.floor(Math.random() * numOfCards) + 1;
   // Keep generating if the card was already used
   while (generatedNumbers.includes(randomNumber)) {
-    randomNumber = Math.floor(Math.random() * 5) + 1;
+    randomNumber = Math.floor(Math.random() * numOfCards) + 1;
   }
   // Update the array with used numbers/cards
   generatedNumbers.push(randomNumber);
@@ -1141,35 +1292,119 @@ async function community() {
     players[currentPlayer].money = players[currentPlayer].money + 200;
     communityMsg = `Congratulations <b>${players[currentPlayer].name}</b>, you won a lottery, <b>$200</b> is yours!`;
   } else if (randomNumber === 2) {
-    players[currentPlayer].money =
-      players[currentPlayer].money - 500 * timesPenalty;
-    communityMsg = `<b>${
-      players[currentPlayer].name
-    }</b>, you were mugged and lost <b>$${500 * timesPenalty}</b>.`;
+    let penalty = 200 * timesPenalty;
+    bank = true;
+    pendingPenalty = players[currentPlayer].money - penalty;
+    players[currentPlayer].money = players[currentPlayer].money - penalty;
+    communityMsg = `<b>${players[currentPlayer].name}</b>, you were mugged and lost <b>$${penalty}</b>.`;
   } else if (randomNumber === 3) {
+    // get out of jail card
+    if (players[currentPlayer].bribe) {
+      // get out of jail card
+      players[currentPlayer].bribe = false;
+      updateLog(
+        `<b>${players[currentPlayer].name}</b> used <b>GET OUT OF JAIL CARD</b>.`,
+        "orange"
+      );
+      return;
+    }
     // set prison turns to 2
     players[currentPlayer].prison = 2;
-    fields[3].occupied.pop();
-    fields[9].occupied.push(players[currentPlayer].name); // insert that player
-    players[currentPlayer].position = 9; // update player position
+    fields[tempMovementPosition].occupied.pop();
+    fields[12].occupied.push(players[currentPlayer].name); // insert that player
+    players[currentPlayer].position = 12; // update player position
+    tempMovementPosition = 12;
     communityMsg = `<b>${players[currentPlayer].name}</b>, you went through a red light. You're going to jail for 2 turns!`;
   } else if (randomNumber === 4) {
-    fields[3].occupied.pop();
-    fields[11].occupied.push(players[currentPlayer].name); // insert that player
-    players[currentPlayer].position = 11; // update player position
-    tempMovementPosition = 11;
-    communityMsg = `<b>${players[currentPlayer].name}</b>, you took a taxi to <b>Fancy Street 2.</b>`;
-    await fields[11].action(); // action
-    await fields[11].isPlayerDead(); // action
+    fields[tempMovementPosition].occupied.pop();
+    fields[14].occupied.push(players[currentPlayer].name); // insert that player
+    players[currentPlayer].position = 14; // update player position
+    tempMovementPosition = 14;
+    communityMsg = `<b>${players[currentPlayer].name}</b>, you took a taxi to <b>${fields[14].name}.</b>`;
+    await fields[14].action(); // action
+    await fields[14].isPlayerDead(); // action
   } else if (randomNumber === 5) {
-    fields[3].occupied.pop();
+    fields[tempMovementPosition].occupied.pop();
     fields[0].occupied.push(players[currentPlayer].name); // insert that player
     players[currentPlayer].position = 0; // update player position
     tempMovementPosition = 0;
     communityMsg = `<b>${players[currentPlayer].name}</b>, you went straight to the start. <b>Collect your cash!</b>`;
     await fields[0].action(); // action
     await fields[0].isPlayerDead(); // action
+  } else if (randomNumber === 6) {
+    fields[tempMovementPosition].occupied.pop();
+    fields[tempMovementPosition + 2].occupied.push(players[currentPlayer].name); // insert that player
+    players[currentPlayer].position = tempMovementPosition + 2; // update player position
+    tempMovementPosition = tempMovementPosition + 2;
+    communityMsg = `<b>${players[currentPlayer].name}</b>, go 2 fields forward to <b>${fields[tempMovementPosition].name}.</b>`;
+    await fields[tempMovementPosition].action(); // action
+    await fields[tempMovementPosition].isPlayerDead(); // action
+  } else if (randomNumber === 7) {
+    players[currentPlayer].bribe = true;
+    communityMsg = `<b>${players[currentPlayer].name}</b>, you received <b>GET OUT OF JAIL CARD</b>.`;
+  } else if (randomNumber === 8) {
+    chairman = true;
+    let penalty = 100;
+    // calcs amount of players that need to be paid
+    let count = 0;
+    players.forEach((e) => {
+      if (
+        e === players[currentPlayer] ||
+        (e !== players[currentPlayer] && e.money < 0)
+      ) {
+        // do nothign
+      } else {
+        count++;
+      }
+    });
+    // distribute cash
+    players.forEach((e) => {
+      if (
+        e === players[currentPlayer] ||
+        (e !== players[currentPlayer] && e.money < 0)
+      ) {
+        // do nothign
+      } else {
+        if (count * penalty > players[currentPlayer].money) {
+          let newPenalty = players[currentPlayer].money / count;
+          e.money += newPenalty;
+        } else {
+          e.money += penalty;
+        }
+      }
+    });
+    players[currentPlayer].money -= penalty * count;
+    pendingPenalty = -(players[currentPlayer].money - count * pendingPenalty);
+    communityMsg = `${players[currentPlayer].name}, you have been elected Chairman of the Board. Pay each player <b>$100</b>`;
   }
+}
+// tax field action
+function tax() {
+  bank = true;
+  let tax = (players[currentPlayer].money * 15) / 100;
+  players[currentPlayer].money -= tax;
+  communityMsg = `<b>${
+    players[currentPlayer].name
+  }</b>, you got in trouble with HMRC. You need to pay <b>15%</b> TAX - <b>$${Math.floor(
+    tax
+  )}.</b>`;
+}
+// Go to jail field action
+function goToJail() {
+  if (players[currentPlayer].bribe) {
+    players[currentPlayer].bribe = false;
+    updateLog(
+      `<b>${players[currentPlayer].name}</b> used <b>GET OUT OF JAIL CARD</b>.`,
+      "orange"
+    );
+    return;
+  }
+  players[currentPlayer].prison = 1;
+  fields[4].occupied.pop();
+  fields[12].occupied.push(players[currentPlayer].name); // insert that player
+  players[currentPlayer].position = 12; // update player position
+  tempMovementPosition = 12;
+  communityMsg = `<b>${players[currentPlayer].name}</b>, you went through a red light. You're going to jail for 1 turn!`;
 }
 // Buy the street, visit the street that you own or pay the penalty if you do not
 async function streetAction() {
@@ -1218,6 +1453,8 @@ async function streetAction() {
       }
       no.addEventListener("click", handleNoClick);
     });
+  } else if (!this.owned && players[currentPlayer].money < this.buyoutPrice) {
+    propertyPenaltyMsg = `<b>${players[currentPlayer].name}</b> you cannot afford to buy ${this.name}.`;
   } else if (this.ownedby === players[currentPlayer].name) {
     // If you own this street and visit it
     welcomeHomeMsg = "Welcome home.";
@@ -1228,16 +1465,19 @@ async function streetAction() {
     // if you have to pay
   } else {
     if (!players.find((player) => player.name === this.ownedby)?.prison) {
-      propertyPenaltyMsg = `<b>${players[currentPlayer].name}</b>, you entered <b>${this.ownedby}</b>'s property: <b>${this.name}</b>, and had to pay <b>$${this.penalty}</b>.`;
+      propertyPenaltyMsg = `<b>${
+        players[currentPlayer].name
+      }</b>, you entered <b>${this.ownedby}</b>'s property: <b>${
+        this.name
+      }</b>, and had to pay <b>$${Math.floor(this.penalty)}</b>.`;
       // If the player cannot afford to pay the penalty in full only take his remaining money
       if (players[currentPlayer].money < this.penalty) {
-        players.find((player) => player.name === this.ownedby).money +=
-          players[currentPlayer].money;
         pendingPenaltyBenefactor = players.find(
           (player) => player.name === this.ownedby
         );
         pendingPenalty = this.penalty - players[currentPlayer].money;
-        players[currentPlayer].money = -1;
+        pendingPenaltyBenefactor.money += players[currentPlayer].money;
+        players[currentPlayer].money -= this.penalty;
         updatePlayerInfo();
       } else {
         // If player can afford the penalty substract the penalty amount from his account
@@ -1253,67 +1493,67 @@ async function streetAction() {
 }
 // If you own a set of streets upgrade them when stepped on a given field
 // OBSOLETE REPLACED BY INTERFACE UPGRADE PROPERTY
-function upgradeProperty() {
-  //If player owns this field and adjecent and that field is part of a set...
-  if (
-    fields[tempMovementPosition].set === fields[tempMovementPosition - 1].set ||
-    fields[tempMovementPosition].set === fields[tempMovementPosition + 1].set
-  ) {
-    if (
-      fields[tempMovementPosition].ownedby ===
-        fields[tempMovementPosition - 1]?.ownedby ||
-      fields[tempMovementPosition].ownedby ===
-        fields[tempMovementPosition + 1]?.ownedby
-    ) {
-      if (
-        fields[tempMovementPosition].rank < 4 &&
-        players[currentPlayer].money >= fields[tempMovementPosition].buyoutPrice
-      ) {
-        return new Promise((resolve) => {
-          toggleModal();
-          generatePopupMsg(
-            `You can upgrade this <b>${fields[tempMovementPosition].name}<b> for <b>$${fields[tempMovementPosition].buyoutPrice}<b>.`
-          );
-          yes.eventListener = () => {
-            toggleModal();
-            players[currentPlayer].money =
-              players[currentPlayer].money -
-              fields[tempMovementPosition].buyoutPrice;
-            fields[tempMovementPosition].rank += 1;
-            fields[tempMovementPosition].penalty *= 1.5;
-            fields[tempMovementPosition].penalty = Math.floor(
-              fields[tempMovementPosition].penalty
-            );
-            updateLog(
-              `<b>${players[currentPlayer].name}<b> upgraded <b>${fields[tempMovementPosition].name}</b> for <b>$${fields[tempMovementPosition].buyoutPrice}</b> to rank <b>${fields[tempMovementPosition].rank}</b>.`,
-              "lightgreen"
-            );
-            updatePlayerInfo();
-            updateMap();
-            no.removeEventListener("click", handleNoClick2);
-            yes.removeEventListener("click", yes.eventListener);
-            postponedMSG = 1;
-            resolve();
-          };
-          yes.addEventListener("click", yes.eventListener);
-          function handleNoClick2() {
-            toggleModal();
-            // Remove the event listener
-            yes.removeEventListener("click", yes.eventListener);
-            no.removeEventListener("click", handleNoClick2);
-            postponedMSG = 1;
-            resolve();
-          }
-          no.addEventListener("click", handleNoClick2);
-        });
-      }
-    }
-  }
-}
+// function upgradeProperty() {
+//   //If player owns this field and adjecent and that field is part of a set...
+//   if (
+//     fields[tempMovementPosition].set === fields[tempMovementPosition - 1].set ||
+//     fields[tempMovementPosition].set === fields[tempMovementPosition + 1].set
+//   ) {
+//     if (
+//       fields[tempMovementPosition].ownedby ===
+//         fields[tempMovementPosition - 1]?.ownedby ||
+//       fields[tempMovementPosition].ownedby ===
+//         fields[tempMovementPosition + 1]?.ownedby
+//     ) {
+//       if (
+//         fields[tempMovementPosition].rank < 4 &&
+//         players[currentPlayer].money >= fields[tempMovementPosition].buyoutPrice
+//       ) {
+//         return new Promise((resolve) => {
+//           toggleModal();
+//           generatePopupMsg(
+//             `You can upgrade this <b>${fields[tempMovementPosition].name}<b> for <b>$${fields[tempMovementPosition].buyoutPrice}<b>.`
+//           );
+//           yes.eventListener = () => {
+//             toggleModal();
+//             players[currentPlayer].money =
+//               players[currentPlayer].money -
+//               fields[tempMovementPosition].buyoutPrice;
+//             fields[tempMovementPosition].rank += 1;
+//             fields[tempMovementPosition].penalty *= 1.5;
+//             fields[tempMovementPosition].penalty = Math.floor(
+//               fields[tempMovementPosition].penalty
+//             );
+//             updateLog(
+//               `<b>${players[currentPlayer].name}<b> upgraded <b>${fields[tempMovementPosition].name}</b> for <b>$${fields[tempMovementPosition].buyoutPrice}</b> to rank <b>${fields[tempMovementPosition].rank}</b>.`,
+//               "lightgreen"
+//             );
+//             updatePlayerInfo();
+//             updateMap();
+//             no.removeEventListener("click", handleNoClick2);
+//             yes.removeEventListener("click", yes.eventListener);
+//             postponedMSG = 1;
+//             resolve();
+//           };
+//           yes.addEventListener("click", yes.eventListener);
+//           function handleNoClick2() {
+//             toggleModal();
+//             // Remove the event listener
+//             yes.removeEventListener("click", yes.eventListener);
+//             no.removeEventListener("click", handleNoClick2);
+//             postponedMSG = 1;
+//             resolve();
+//           }
+//           no.addEventListener("click", handleNoClick2);
+//         });
+//       }
+//     }
+//   }
+// }
 // Check if only one player is left with money
 function determineWinner() {
   for (let i = 0; i < players.length; i++) {
-    if (players[i].money > 0) {
+    if (players[i].money >= 0) {
       // only players with money are taken into consideration
       // the first player with money becomes a temporary winner
       // if there is anotehr player found with money the winner is remved and the function terminates

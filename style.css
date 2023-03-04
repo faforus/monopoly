@@ -63,6 +63,22 @@ h3 {
   padding: 10px;
 }
 
+#gamename {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -365px);
+  width: 500px;
+  height: 120px;
+  z-index: 5;
+}
+
 #map {
   display: flex;
   flex-wrap: wrap;
@@ -87,15 +103,16 @@ h3 {
 
 #log {
   overflow: auto;
-  width: 590px;
-  height: 400px;
-  max-height: 400px;
+  width: 690px;
+  height: 455px;
+  max-height: 455px;
   background-color: white;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -105px);
   z-index: 1;
+  border-radius: 50px 0px 0px 50px;
   box-sizing: border-box;
   padding: 10px 30px 10px 30px;
 }
@@ -198,18 +215,79 @@ h3 {
   text-align: center;
 }
 
+#fielddiv {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  position: relative;
+  width: 250px;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#fielddivempty {
+  border-radius: 10px;
+  position: relative;
+  width: 250px;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  padding: 0;
+  margin: 1px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.row {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.popups {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  width: 620px;
+  height: 150px;
+  background-color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  padding: 20px;
+  border-radius: 50px;
+  transform: translate(-50%, 145px);
+  border-radius: 50px;
+  z-index: 9999;
+}
+
+.popupmsg {
+  margin: auto;
+  width: 500px;
+  background-color: rgb(255, 255, 255);
+}
+
 .buyPopup {
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
   align-content: center;
   position: absolute;
-  width: 590px;
+  width: 620px;
   height: 150px;
+  padding: 20px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, 145px);
   background-color: teal;
+  border-radius: 50px;
   z-index: 6;
 }
 
@@ -228,12 +306,14 @@ h3 {
   align-items: center;
   justify-content: center;
   position: absolute;
-  width: 590px;
+  width: 620px;
   height: 150px;
   top: 50%;
   left: 50%;
+  padding: 20px;
   transform: translate(-50%, 145px);
   background-color: tomato;
+  border-radius: 50px;
   z-index: 6;
 }
 
@@ -241,30 +321,37 @@ h3 {
   color: black;
 }
 
-.fielddiv {
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  position: relative;
-  width: 300px;
-  height: 300px;
+.houses {
   display: flex;
+  flex-wrap: wrap;
   flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 620px;
+  height: 120px;
+  top: 50%;
+  left: 50%;
+  padding: 0px;
+  transform: translate(-50%, 25px);
+  background-color: teal;
+  border-radius: 50px;
+  z-index: 6;
+}
+
+.houses p {
+  margin: 0px;
+}
+
+.housesbtns {
+  display: flex;
+  justify-content: center;
+  margin: 5px;
+}
+
+.housestxt {
   text-align: center;
   padding: 0;
-  margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.row {
-  display: flex;
-  padding: 0;
-  margin: 0;
-  border: 0;
-}
-
-.emptyfield {
-  border: none;
 }
 
 .allStreets {
@@ -279,9 +366,13 @@ h3 {
   border-radius: 10px;
   background-color: rgb(221, 18, 18);
   width: 100%;
-  height: 50px;
+  height: 30px;
   position: absolute;
   bottom: 0px;
+}
+
+.redsus p {
+  margin: 5px;
 }
 
 .field-1 {
@@ -291,9 +382,13 @@ h3 {
 .slumst {
   background-color: rgb(142, 189, 66);
   width: 100%;
-  height: 50px;
+  height: 30px;
   position: absolute;
   bottom: 0px;
+}
+
+.slumst p {
+  margin: 5px;
 }
 
 .old-kent-road,
@@ -302,62 +397,65 @@ h3 {
 }
 
 .field-2 {
-  width: 300px;
-  height: 300px;
   background-color: rgb(167, 204, 108);
 }
 
 .field-3 {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  width: 300px;
-  height: 300px;
-  background-color: rgb(211, 97, 71);
+  background-color: rgb(116, 216, 133);
 }
 
 .field-4 {
-  width: 300px;
-  height: 300px;
+  background-color: rgb(211, 97, 71);
+}
+
+.field-6 {
   background-color: rgb(194, 194, 101);
 }
 
 .poorst {
   background-color: rgb(139, 139, 72);
   width: 100%;
+  height: 30px;
   position: absolute;
   bottom: 0;
 }
 
+.poorst p {
+  margin: 5px;
+}
+
 .the-angel,
-.euston-road {
+.euston-road,
+.king-s-cross {
   background-color: rgb(139, 139, 72);
 }
 
 .field-5 {
-  width: 300px;
-  height: 300px;
-  background-color: rgb(191, 191, 77);
-}
-
-.field-6 {
-  width: 300px;
-  height: 300px;
-  background-color: rgb(140, 120, 174);
+  background-color: rgb(194, 194, 127);
 }
 
 .field-7 {
-  width: 300px;
-  height: 300px;
+  background-color: rgb(191, 191, 77);
+}
+
+.field-8 {
+  background-color: rgb(140, 120, 174);
+}
+
+.field-9 {
   background-color: rgb(90, 207, 201);
 }
 
 .regularst {
   background-color: rgb(51, 141, 138);
   width: 100%;
-  height: 50px;
+  height: 30px;
   position: absolute;
   bottom: 0px;
+}
+
+.regularst p {
+  margin: 5px;
 }
 
 .vine-street,
@@ -365,36 +463,40 @@ h3 {
   background-color: rgb(51, 141, 138);
 }
 
-.field-8 {
-  width: 300px;
-  height: 300px;
+.field-10 {
   background-color: lightseagreen;
 }
 
-.field-9 {
-  width: 300px;
-  height: 300px;
+.field-11 {
+  background-color: rgb(88, 132, 212);
+}
+
+.field-12 {
   background-color: rgb(199, 100, 81);
 }
 
-.field-10 {
-  width: 300px;
-  height: 300px;
+.field-13 {
   background-color: rgb(96, 93, 193);
 }
 
-.field-11 {
-  width: 300px;
-  height: 300px;
+.field-14 {
   background-color: rgb(88, 85, 197);
 }
 
 .fancyst {
   background-color: rgb(74, 71, 150);
   width: 100%;
-  height: 50px;
+  height: 30px;
   position: absolute;
   bottom: 0px;
+}
+
+.field-15 {
+  background-color: rgb(194, 192, 64);
+}
+
+.fancyst p {
+  margin: 5px;
 }
 
 .park-lane,
@@ -416,7 +518,8 @@ h3 {
   height: 20px;
   background-color: rgb(181, 99, 99);
   position: absolute;
-  bottom: 50px;
+  bottom: 30px;
+  border-radius: 5px;
 }
 
 .little {
@@ -426,8 +529,8 @@ h3 {
 }
 
 .pawnzone {
-  width: 250px;
-  height: 180px;
+  width: 200px;
+  height: 100px;
   transform: translate(25px, 70px);
   position: absolute;
 }
@@ -454,26 +557,6 @@ li {
   line-height: 30px;
   background-color: azure;
   border-radius: 30px;
-}
-
-.popups {
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  width: 590px;
-  height: 150px;
-  background-color: white;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, 145px);
-  z-index: 9999;
-}
-
-.popupmsg {
-  margin: auto;
-  width: 500px;
-  background-color: rgb(255, 255, 255);
 }
 
 .buttons {
@@ -560,7 +643,7 @@ li {
 
 .field-player {
   height: 160px;
-  margin-top: -8px;
+  margin-top: -25px;
   text-transform: uppercase;
   color: brown;
   font-size: medium;
@@ -582,27 +665,6 @@ li {
 
 ::-webkit-scrollbar-thumb {
   background-color: tomato;
-}
-
-.houses {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  width: 590px;
-  height: 100px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, 45px);
-  background-color: teal;
-  z-index: 6;
-}
-
-.housestxt {
-  text-align: center;
-  padding: 0;
 }
 
 .left {
@@ -628,4 +690,8 @@ li {
 
 .hidden {
   display: none;
+}
+
+.houseserror {
+  font-size: smaller;
 }
