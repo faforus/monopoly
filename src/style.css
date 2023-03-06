@@ -237,41 +237,36 @@ h3 {
 #view-port {
   height: 100vh;
   width: 100%;
+  z-index: 1;
 }
 
 @media screen and (min-height: 0px) and (max-height: 876px) {
   #view-port {
     transform: scale(0.6);
+    z-index: 1;
   }
-  .buyPopup,
-  .suspendPopup,
-  .houses,
-  .popups {
-    margin-top: -100px;
+  .overlay {
+    transform: scale(1.666666);
   }
 }
 
 @media screen and (min-height: 876px) and (max-height: 1028px) {
   #view-port {
     transform: scale(0.7);
+    z-index: 1;
   }
-  .buyPopup,
-  .suspendPopup,
-  .houses,
-  .popups {
-    margin-top: -100px;
+  .overlay {
+    transform: scale(1.4285714);
   }
 }
 
 @media screen and (min-height: 1028px) and (max-height: 1260px) {
   #view-port {
     transform: scale(0.8);
+    z-index: 1;
   }
-  .buyPopup,
-  .suspendPopup,
-  .houses,
-  .popups {
-    margin-top: -100px;
+  .overlay {
+    transform: scale(1.25);
   }
 }
 
