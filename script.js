@@ -1491,65 +1491,6 @@ async function streetAction() {
     }
   }
 }
-// If you own a set of streets upgrade them when stepped on a given field
-// OBSOLETE REPLACED BY INTERFACE UPGRADE PROPERTY
-// function upgradeProperty() {
-//   //If player owns this field and adjecent and that field is part of a set...
-//   if (
-//     fields[tempMovementPosition].set === fields[tempMovementPosition - 1].set ||
-//     fields[tempMovementPosition].set === fields[tempMovementPosition + 1].set
-//   ) {
-//     if (
-//       fields[tempMovementPosition].ownedby ===
-//         fields[tempMovementPosition - 1]?.ownedby ||
-//       fields[tempMovementPosition].ownedby ===
-//         fields[tempMovementPosition + 1]?.ownedby
-//     ) {
-//       if (
-//         fields[tempMovementPosition].rank < 4 &&
-//         players[currentPlayer].money >= fields[tempMovementPosition].buyoutPrice
-//       ) {
-//         return new Promise((resolve) => {
-//           toggleModal();
-//           generatePopupMsg(
-//             `You can upgrade this <b>${fields[tempMovementPosition].name}<b> for <b>$${fields[tempMovementPosition].buyoutPrice}<b>.`
-//           );
-//           yes.eventListener = () => {
-//             toggleModal();
-//             players[currentPlayer].money =
-//               players[currentPlayer].money -
-//               fields[tempMovementPosition].buyoutPrice;
-//             fields[tempMovementPosition].rank += 1;
-//             fields[tempMovementPosition].penalty *= 1.5;
-//             fields[tempMovementPosition].penalty = Math.floor(
-//               fields[tempMovementPosition].penalty
-//             );
-//             updateLog(
-//               `<b>${players[currentPlayer].name}<b> upgraded <b>${fields[tempMovementPosition].name}</b> for <b>$${fields[tempMovementPosition].buyoutPrice}</b> to rank <b>${fields[tempMovementPosition].rank}</b>.`,
-//               "lightgreen"
-//             );
-//             updatePlayerInfo();
-//             updateMap();
-//             no.removeEventListener("click", handleNoClick2);
-//             yes.removeEventListener("click", yes.eventListener);
-//             postponedMSG = 1;
-//             resolve();
-//           };
-//           yes.addEventListener("click", yes.eventListener);
-//           function handleNoClick2() {
-//             toggleModal();
-//             // Remove the event listener
-//             yes.removeEventListener("click", yes.eventListener);
-//             no.removeEventListener("click", handleNoClick2);
-//             postponedMSG = 1;
-//             resolve();
-//           }
-//           no.addEventListener("click", handleNoClick2);
-//         });
-//       }
-//     }
-//   }
-// }
 // Check if only one player is left with money
 function determineWinner() {
   for (let i = 0; i < players.length; i++) {
