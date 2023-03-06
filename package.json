@@ -1,0 +1,26 @@
+{
+  "name": "monopoly",
+  "version": "1.0.0",
+  "description": "",
+  "default": "index.html",
+  "targets": {
+    "main": false
+  },
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html --dist-dir ./dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/faforus/monopoly.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/faforus/monopoly/issues"
+  },
+  "homepage": "https://github.com/faforus/monopoly#readme",
+  "devDependencies": {
+    "parcel": "^2.8.3"
+  }
+}
