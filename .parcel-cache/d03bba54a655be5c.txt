@@ -1,4 +1,4 @@
-4263
+4271
 55F:\monopoly\node_modules\@parcel\cache\lib\LMDBCache.js133225814727394765 0
 36F:\monopoly\node_modules\yaml\map.js133225814727831254 0
 38F:\monopoly\node_modules\msgpackr\dist133225814729974330 1
@@ -17,7 +17,7 @@
 79F:\monopoly\node_modules\@swc\helpers\lib\_class_check_private_static_access.js133225814728089167 0
 49F:\monopoly\node_modules\weak-lru-cache\README.md133225814726928343 0
 49F:\monopoly\node_modules\abortcontroller-polyfill133225814727885807 1
-16F:\monopoly\dist133225822540226619 1
+16F:\monopoly\dist133225905204631178 1
 49F:\monopoly\node_modules\@parcel\watcher\index.js133225814729582497 0
 60F:\monopoly\node_modules\source-map\dist\source-map.debug.js133225814728491106 0
 83F:\monopoly\node_modules\@parcel\optimizer-image\parcel-image.linux-arm64-musl.node133225814731155026 0
@@ -32,7 +32,7 @@
 37F:\monopoly\node_modules\domutils\lib133225814728848226 1
 54F:\monopoly\node_modules\terser\lib\compress\common.js133225814728838303 0
 67F:\monopoly\node_modules\lightningcss\node\browserslistToTargets.js133225814726853942 0
-22F:\monopoly\.gitignore133210994713344697 0
+22F:\monopoly\.gitignore133225896070730724 0
 33F:\monopoly\node_modules\has-flag133225814725693097 1
 62F:\monopoly\node_modules\@parcel\transformer-babel\lib\flow.js133225814727697328 0
 55F:\monopoly\node_modules\cosmiconfig\dist\Explorer.d.ts133225814729642018 0
@@ -53,7 +53,7 @@
 35F:\monopoly\node_modules\micromatch133225814725256584 1
 49F:\monopoly\node_modules\nullthrows\nullthrows.js133225814725360768 0
 42F:\monopoly\node_modules\commander\LICENSE133225814724343773 0
-22F:\monopoly\index.html133225806583041657 0
+22F:\monopoly\index.html133225901230698717 0
 52F:\monopoly\node_modules\css-tree\lib\utils\names.js133225814731229419 0
 68F:\monopoly\node_modules\update-browserslist-db\check-npm-version.js133225814724581856 0
 63F:\monopoly\node_modules\@parcel\packager-js\lib\dev-prelude.js133225814725638527 0
@@ -70,7 +70,7 @@
 72F:\monopoly\node_modules\caniuse-lite\data\features\fieldset-disabled.js133225814732787205 0
 24F:\monopoly\node_modules133225814738313637 1
 51F:\monopoly\node_modules\lightningcss\node\index.js133225814727245814 0
-25F:\monopoly\src\script.js133225822461538024 0
+25F:\monopoly\src\script.js133225905165022339 0
 50F:\monopoly\node_modules\@parcel\codeframe\LICENSE133225814724383452 0
 74F:\monopoly\node_modules\@parcel\runtime-js\lib\helpers\bundle-manifest.js133225814725420292 0
 35F:\monopoly\node_modules\terser\lib133225814730415953 1
@@ -92,7 +92,7 @@
 69F:\monopoly\node_modules\caniuse-lite\data\features\css-page-break.js133225814732325925 0
 72F:\monopoly\node_modules\lmdb\dependencies\lz4\lib\dll\example\README.md133225814731864461 0
 61F:\monopoly\node_modules\lmdb\dependencies\lz4\lib\lz4frame.h133225814731388302 0
-25F:\monopoly\src\style.css133225809560028050 0
+25F:\monopoly\src\style.css133225904278766922 0
 55F:\monopoly\node_modules\nth-check\lib\esm\index.js.map133225814727945329 0
 44F:\monopoly\node_modules\htmlparser2\LICENSE133225814724338816 0
 50F:\monopoly\node_modules\@parcel\packager-html\src133225814725112610 1
@@ -268,6 +268,7 @@
 42F:\monopoly\node_modules\@parcel\fs-search133225814730018971 1
 48F:\monopoly\node_modules\@parcel\source-map\dist133225814728287749 1
 58F:\monopoly\node_modules\@parcel\graph\src\ContentGraph.js133225814727166455 0
+38F:\monopoly\dist\index.4400c4c6.js.map133225905204631178 0
 53F:\monopoly\node_modules\svgo\plugins\inlineStyles.js133225814729225208 0
 56F:\monopoly\node_modules\caniuse-lite\data\regions\JP.js133225814733303220 0
 80F:\monopoly\node_modules\lmdb\dependencies\lmdb\libraries\liblmdb\sample-bdb.txt133225814731953746 0
@@ -385,6 +386,7 @@
 73F:\monopoly\node_modules\@babel\highlight\node_modules\color-name\LICENSE133225814725455012 0
 54F:\monopoly\node_modules\react-refresh\build-info.json133225814726997793 0
 80F:\monopoly\node_modules\htmlnano\docs\versioned_docs\version-1.1.1\020-usage.md133225814730301869 0
+35F:\monopoly\dist\index.b69d494e.css133225904785492722 0
 35F:\monopoly\node_modules\nullthrows133225814726060131 1
 72F:\monopoly\node_modules\@parcel\core\test\fixtures\main-format-mismatch133225814732232874 1
 35F:\monopoly\node_modules\parcel\src133225814726407574 1
@@ -820,6 +822,7 @@
 75F:\monopoly\node_modules\@parcel\reporter-dev-server\src\templates\404.html133225814725236607 0
 73F:\monopoly\node_modules\caniuse-lite\data\features\font-unicode-range.js133225814732866567 0
 57F:\monopoly\node_modules\lmdb\dependencies\lmdb\libraries133225814725191991 1
+39F:\monopoly\dist\index.b69d494e.css.map133225904785547300 0
 62F:\monopoly\node_modules\css-tree\lib\syntax\pseudo\matches.js133225814731169904 0
 81F:\monopoly\node_modules\@parcel\watcher\prebuilds\win32-x64\node.napi.glibc.node133225814730460586 0
 59F:\monopoly\node_modules\utility-types\dist\mapped-types.js133225814725831976 0
@@ -1702,6 +1705,7 @@
 97F:\monopoly\node_modules\msgpackr-extract\node_modules\node-gyp-build-optional-packages\README.md133225814726541468 0
 101F:\monopoly\node_modules\msgpackr-extract\node_modules\.bin\node-gyp-build-optional-packages-optional133225814735927369 0
 97F:\monopoly\node_modules\msgpackr-extract\node_modules\.bin\node-gyp-build-optional-packages-test133225814735922408 0
+34F:\monopoly\dist\index.4400c4c6.js133225905204586538 0
 76F:\monopoly\node_modules\lmdb\dependencies\lmdb\libraries\liblmdb\mdb_stat.1133225814729116085 0
 101F:\monopoly\node_modules\msgpackr-extract\node_modules\.bin\node-gyp-build-optional-packages-test.ps1133225814735917448 0
 68F:\monopoly\node_modules\lmdb\node_modules\node-addon-api\LICENSE.md133225814728352225 0
@@ -2828,6 +2832,7 @@
 105F:\monopoly\node_modules\@parcel\source-map\parcel_sourcemap_wasm\dist-node\parcel_sourcemap_wasm_bg.wasm133225814731244301 0
 60F:\monopoly\node_modules\caniuse-lite\data\features\asmjs.js133225814729651935 0
 75F:\monopoly\node_modules\@parcel\utils\test\replaceBundleReferences.test.js133225814730688749 0
+34F:\monopoly\dist\index.eb8107e0.js133225836592739573 0
 70F:\monopoly\node_modules\caniuse-lite\data\features\async-functions.js133225814729711454 0
 86F:\monopoly\node_modules\@parcel\package-manager\test\fixtures\has-a-not-yet-installed133225814729770974 1
 60F:\monopoly\node_modules\caniuse-lite\data\features\audio.js133225814729820579 0
@@ -4172,7 +4177,7 @@
 74F:\monopoly\node_modules\@jridgewell\source-map\dist\types\source-map.d.ts133225814727588206 0
 54F:\monopoly\node_modules\@jridgewell\set-array\LICENSE133225814724383452 0
 56F:\monopoly\node_modules\@jridgewell\set-array\README.md133225814726313304 0
-34F:\monopoly\dist\index.a96c1086.js133225822540191894 0
+34F:\monopoly\dist\index.a96c1086.js133225843953658315 0
 50F:\monopoly\node_modules\@jridgewell\set-array\src133225814727116855 1
 63F:\monopoly\node_modules\@jridgewell\set-array\src\set-array.ts133225814727166455 0
 69F:\monopoly\node_modules\@jridgewell\set-array\dist\set-array.mjs.map133225814725544286 0
@@ -4260,5 +4265,8 @@
 35F:\monopoly\dist\arrow.7c479024.svg133225814797271112 0
 34F:\monopoly\dist\index.9dcb7618.js133225814799488680 0
 38F:\monopoly\dist\index.9dcb7618.js.map133225814799513482 0
-38F:\monopoly\dist\index.a96c1086.js.map133225822540226619 0
-27F:\monopoly\dist\index.html133225822540191894 0
+38F:\monopoly\dist\index.a96c1086.js.map133225843953707918 0
+34F:\monopoly\dist\index.c9a9fd6a.js133225904785497683 0
+38F:\monopoly\dist\index.c9a9fd6a.js.map133225904785547300 0
+38F:\monopoly\dist\index.eb8107e0.js.map133225836592769336 0
+27F:\monopoly\dist\index.html133225905204586538 0

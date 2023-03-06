@@ -4,31 +4,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <link rel="stylesheet" type="text/css" href="./src/style.css">
   <script type="module" defer src="./src/script.js"></script>
   <title>Monopoly</title>
 </head>
 
 <body>
-  <div id="gamename">FIFIPOLY</div>
-  <button id="btn1" class="smallBTN">Start Game</button>
-
-
-  <button id="death" class="hidden">READY</button>
-  <div id="dieTable">
-    <div id="dieBorder1">
-      <div id="die1"></div>
-    </div>
-    <div id="dieBorder2">
-      <div id="die2"></div>
-    </div>
-  </div>
-
-  <div id="log">
-    <div></div>
-  </div>
-
   <div class="buyPopup hidden">
     <p class="buyPopupTxt"></p>
     <div>
@@ -59,7 +41,6 @@
     <p class="houseserror"></p>
   </div>
 
-
   <div class="popups hidden">
     <div class="popupmsg"> </div>
     <div class="buttons">
@@ -68,8 +49,31 @@
     </div>
   </div>
 
-  <div id="map">
-  </div>
+  <div id="view-port">
+
+    <div id="gamename">FIFIPOLY</div>
+    <button id="btn1" class="smallBTN">Start Game</button>
+    <button id="death" class="hidden">READY</button>
+
+
+
+    <div id="dieTable">
+      <div id="dieBorder1">
+        <div id="die1"></div>
+      </div>
+      <div id="dieBorder2">
+        <div id="die2"></div>
+      </div>
+    </div>
+
+    <div id="log">
+      <div></div>
+    </div>
+
+
+
+    <div id="map">
+    </div>
 
   </div>
   <div class="overlay hidden"></div>

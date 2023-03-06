@@ -722,7 +722,7 @@ function updatePlayerInfo() {
     const scoreboard = document.createElement("div");
     scoreboard.style = "text-align: center";
     scoreboard.id = "player-info";
-    document.body.append(scoreboard);
+    document.getElementById("view-port").append(scoreboard);
   }
 
   const scoreboard = document.getElementById("player-info");
