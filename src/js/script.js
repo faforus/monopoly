@@ -1,6 +1,6 @@
-"use strict";
-// import "core-js/stable";
-// import "regenerator-runtime/runtime";
+// "use strict";
+import "core-js/stable";
+import "regenerator-runtime/runtime";
 
 // switch cases
 // add favicon
@@ -284,10 +284,6 @@ updateMap();
 // Generate the dice on page load
 displayDie(4, "die1");
 displayDie(4, "die2");
-// if HTML module type
-// if (module.hot) {
-//   module.hot.accept();
-// }
 
 // Create and update the map
 function updateMap() {
@@ -1673,5 +1669,5 @@ function whoseTurn() {
   }, 350);
 }
 // Start the game with default players. Press start game button and close the window
-startGame("Filip", "Asia", "Michał", "Magda");
-if (state.players.length > 0) btn1.style.display = "none";
+// startGame("Filip", "Asia", "Michał", "Magda");
+// if (state.players.length > 0) btn1.style.display = "none";
