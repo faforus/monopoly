@@ -26,14 +26,12 @@ const buyPopup = document.querySelector(".buyPopup");
 const buyPopupTxt = document.querySelector(".buyPopupTxt");
 const btnSell = document.getElementById("sell");
 const btnNoSell = document.getElementById("noSell");
-const buyButtonIctive = document.querySelector(".buyButtonIctive");
 const moneyInput = document.querySelector(".moneyInput");
 const buyPopupError = document.querySelector(".buyPopupError");
 const selectElement = document.querySelector(".property-select");
 const dieTable = document.getElementById("dieTable");
 const suspendPopup = document.querySelector(".suspendPopup");
 const suspendPopupTxt = document.querySelector(".suspendPopupTxt");
-const selectSuspendElement = document.querySelector(".suspend-property-select");
 const btnNoSuspend = document.getElementById("noSuspend");
 const btnSuspend = document.getElementById("suspend");
 const housesPopup = document.querySelector(".houses");
@@ -829,7 +827,7 @@ function sellButtons() {
       let field = fields.find((field) => field.name === fieldName);
       let msg = `${state.players[state.currentPlayer].name} you can mortgage ${
         field.name
-      } for $${field.buyoutPrice}`;
+      } for $${Math.floor(field.buyoutPrice * 0.7)}`;
       toggleSuspendModal(msg);
 
       if (determineAllFieldOwnership(fields[field.number])) {
@@ -894,11 +892,13 @@ function sellButtons() {
         btnSuspend.textContent = "Unmortgage";
         suspendPopupTxt.innerHTML = `${
           state.players[state.currentPlayer].name
-        } you can unmortgage ${field.name} for $${field.buyoutPrice}`;
+        } you can unmortgage ${field.name} for $${Math.floor(
+          field.buyoutPrice * 0.7
+        )}`;
         suspend.EventListener = function () {
           btnRight.removeEventListener("click", upEvent);
           btnLeft.removeEventListener("click", downEvent);
-          state.players[state.currentPlayer].money -= field.buyoutPrice;
+          state.players[state.currentPlayer].money -= field.buyoutPrice * 0.7;
           field.suspended = false;
           let unsuspendMsg = `${
             state.players[state.currentPlayer].name
@@ -930,7 +930,7 @@ function sellButtons() {
           // make the change if can afford
           btnRight.removeEventListener("click", upEvent);
           btnLeft.removeEventListener("click", downEvent);
-          state.players[state.currentPlayer].money += field.buyoutPrice;
+          state.players[state.currentPlayer].money += field.buyoutPrice * 0.7;
           field.suspended = true;
           let suspendMsg = `${
             state.players[state.currentPlayer].name
