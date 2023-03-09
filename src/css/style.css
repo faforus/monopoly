@@ -710,7 +710,7 @@ li {
   padding: 0;
   height: 30px;
   width: 30px;
-  background-image: url(/img/arrow.svg);
+  background-image: url(../img/arrow.svg);
   background-size: contain;
   transform: scaleX(-1);
   border-radius: 50px;
@@ -721,7 +721,7 @@ li {
   padding: 0;
   height: 30px;
   width: 30px;
-  background-image: url(/img/arrow.svg);
+  background-image: url(../img/arrow.svg);
   background-size: contain;
   border-radius: 50px;
   border: 2px solid rgb(255, 255, 255);
