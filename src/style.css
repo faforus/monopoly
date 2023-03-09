@@ -319,6 +319,7 @@ h3 {
   flex-wrap: wrap;
   flex-direction: column;
   align-content: center;
+  justify-content: center;
   position: absolute;
   width: 620px;
   height: 150px;
@@ -332,11 +333,8 @@ h3 {
 }
 
 .buyPopupError {
+  text-align: center;
   font-size: smaller;
-}
-
-.buyPopupTxt {
-  color: black;
 }
 
 .suspendPopup {
@@ -576,6 +574,7 @@ h3 {
 }
 
 .fieldinfoprice {
+  font-size: 15px;
   color: white;
   font-weight: 400;
 }
