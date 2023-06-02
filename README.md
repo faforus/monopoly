@@ -1,4 +1,5 @@
 IMPORTANT! THIS PROJECT IS VERY COMPLEX BUT THE CODE AND STRUCTURING IS VERY BAD. MORE OF WHICH BELOW.
+
 Please DO test the live application as it contains a lot of logic and is surely much more complex than a shopping cart.
 
 I wanted to inform you that there aren't many commits in this repository. During the time I worked on these projects, I was unaware of the significance of maintaining a comprehensive git history. While I used git to add commits and revert changes locally, I did not prioritize pushing them to the remote repository. As a result, the commit history may appear sparse or incomplete.
