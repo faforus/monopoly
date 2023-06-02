@@ -1,11 +1,7 @@
-// "use strict";
-import "core-js/stable";
-import "regenerator-runtime/runtime";
-
-// switch cases
-// add favicon
-// USE THE HASH LOADING FOR BUTTONS?
-// PUBLISHER SUBSCRIBER
+"use strict";
+// import "core-js/stable";
+// import "regenerator-runtime/runtime";
+// function clickHandler - function that is called by event click
 
 // OPTIONS
 const sidesOfDie = 4; // Do not increase to more than 4 -- // lap logic implemented only for up to 2x4 side die
@@ -77,6 +73,12 @@ const state = {
   generatedNumbers: [],
 };
 // Define every single field in the game, certain fields contain methods which are run once the player enters the field. Fields hold information about the streets, buyout price and penalty amount
+
+const defautField = {
+  isPlayerDead,
+  owned: false,
+  ownedby: null,
+};
 const fields = [
   {
     number: 0,
@@ -378,6 +380,7 @@ function collectNames() {
   let names = [];
   let playerNumber = 1;
   // names need to meet certain criteria
+  // IMPORTANT CHECK THIS && TRUE and remove?
   while (names.length < 4 && true) {
     let name = prompt(
       `Player ${playerNumber} enter a name (3 up to 10 characters, one digit only, no special characters or duplicate names).`
@@ -1458,7 +1461,7 @@ async function community() {
     );
     state.communityMsg = `${
       state.players[state.currentPlayer].name
-    }, you have been elected state.Chairman of the Board. Pay each player <b>$100</b>`;
+    }, you have been elected state.Chairman of the Board. Pay each player <b>$100.</b>`;
   }
 }
 // geneerate random number for community chest/chance + shuffle cards
